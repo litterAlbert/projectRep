@@ -1,0 +1,557 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>智慧图书管理系统 - 管理员端</title>
+  <style>
+    :root {
+      --bg: #f4f7ff;
+      --panel: #ffffff;
+      --primary: #2563eb;
+      --primary-soft: #dbeafe;
+      --text: #1e293b;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+      color: var(--text);
+      background: linear-gradient(135deg, #eef4ff 0%, #f8fbff 45%, #f8f7ff 100%);
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 250px 1fr;
+    }
+
+    .sidebar {
+      background: rgba(255, 255, 255, 0.92);
+      border-right: 1px solid var(--line);
+      backdrop-filter: blur(8px);
+      padding: 18px 14px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #eff6ff, #eef2ff);
+      margin-bottom: 18px;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 700;
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .menu-title {
+      margin: 16px 10px 8px;
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    .menu-item {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      text-align: left;
+      color: #334155;
+      padding: 11px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .menu-item:hover {
+      background: #f1f5f9;
+      transform: translateX(2px);
+    }
+
+    .menu-item.active {
+      background: var(--primary-soft);
+      color: #1d4ed8;
+      font-weight: 600;
+    }
+
+    .main {
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .admin-info {
+      background: var(--panel);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      border: 1px solid #edf2f7;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #22c55e;
+    }
+
+    .section {
+      display: none;
+      background: var(--panel);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      border: 1px solid #edf2f7;
+      padding: 18px;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .section h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      background: linear-gradient(135deg, #fff, #f8fbff);
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+
+    .kpi {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .kpi-item {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      background: #f8fbff;
+    }
+
+    .kpi-item .label {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .kpi-item .value {
+      margin-top: 6px;
+      font-size: 24px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 9px 14px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn.primary {
+      color: #fff;
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+    }
+
+    .btn.soft {
+      color: #1d4ed8;
+      background: #e0e7ff;
+    }
+
+    .btn.warn {
+      color: #92400e;
+      background: #fef3c7;
+    }
+
+    .table-wrap {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      min-width: 680px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 11px 10px;
+      border-bottom: 1px solid #f1f5f9;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .assistant-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 14px;
+      min-height: 560px;
+    }
+
+    .session-pane, .chat-pane {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      background: #fcfdff;
+    }
+
+    .pane-title {
+      margin: 0 0 10px;
+      font-size: 14px;
+    }
+
+    .new-session {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .session-list {
+      display: grid;
+      gap: 8px;
+      max-height: 420px;
+      overflow: auto;
+    }
+
+    .session-item {
+      border: 1px solid #dbeafe;
+      border-radius: 10px;
+      background: #eff6ff;
+      padding: 9px;
+      font-size: 13px;
+      color: #1d4ed8;
+    }
+
+    .upload-box {
+      margin-top: 10px;
+      border: 1px dashed #94a3b8;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 13px;
+      color: #475569;
+      background: #f8fafc;
+    }
+
+    .chat-stream {
+      height: 420px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      background: linear-gradient(180deg, #fff, #f8fbff);
+    }
+
+    .bubble {
+      max-width: 88%;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .bubble.user {
+      justify-self: end;
+      background: #dbeafe;
+      color: #1e3a8a;
+    }
+
+    .bubble.ai {
+      justify-self: start;
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    .chat-input {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .chat-input input {
+      border: 1px solid #dbe3ef;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    @media (max-width: 1200px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: relative;
+        height: auto;
+      }
+
+      .grid-2,
+      .assistant-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">管</div>
+        <div>
+          <h1>管理员工作台</h1>
+          <p>Smart Library Admin</p>
+        </div>
+      </div>
+      <div class="menu-title">管理功能</div>
+      <button class="menu-item active" data-target="book-section">图书管理</button>
+      <button class="menu-item" data-target="user-section">用户管理</button>
+      <button class="menu-item" data-target="borrow-section">借阅管理</button>
+      <button class="menu-item" data-target="ai-section">AI助手</button>
+    </aside>
+
+    <main class="main">
+      <section class="topbar">
+        <div class="admin-info">
+          <span class="dot"></span>
+          <span>管理员 admin 已登录</span>
+        </div>
+      </section>
+
+      <section class="section active" id="book-section">
+        <h2>图书管理</h2>
+        <div class="kpi">
+          <div class="kpi-item"><div class="label">馆藏总量</div><div class="value">12,860</div></div>
+          <div class="kpi-item"><div class="label">在馆可借</div><div class="value">8,432</div></div>
+          <div class="kpi-item"><div class="label">预约排队</div><div class="value">318</div></div>
+        </div>
+        <div class="actions">
+          <button class="btn primary">新增图书</button>
+          <button class="btn soft">批量导入</button>
+          <button class="btn warn">下架处理</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ISBN</th>
+                <th>书名</th>
+                <th>作者</th>
+                <th>出版社</th>
+                <th>库存</th>
+                <th>借出数量</th>
+                <th>预约数量</th>
+                <th>馆藏位置</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>9787111641247</td><td>深入理解Java虚拟机</td><td>周志明</td><td>机械工业</td><td>6</td><td>37</td><td>2</td><td>A区-3层</td></tr>
+              <tr><td>9787115545381</td><td>Vue.js 设计与实现</td><td>霍春阳</td><td>人民邮电</td><td>0</td><td>23</td><td>11</td><td>B区-2层</td></tr>
+              <tr><td>9787111407010</td><td>算法导论</td><td>Thomas</td><td>机械工业</td><td>2</td><td>58</td><td>3</td><td>A区-1层</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="user-section">
+        <h2>用户管理</h2>
+        <div class="grid-2">
+          <article class="card">
+            <h3>用户筛选与统计</h3>
+            <div class="kpi">
+              <div class="kpi-item"><div class="label">用户总数</div><div class="value">2,039</div></div>
+              <div class="kpi-item"><div class="label">本月新增</div><div class="value">164</div></div>
+              <div class="kpi-item"><div class="label">管理员</div><div class="value">7</div></div>
+            </div>
+            <div class="actions">
+              <button class="btn primary">新增用户</button>
+              <button class="btn soft">角色分配</button>
+              <button class="btn warn">冻结账号</button>
+            </div>
+          </article>
+          <article class="card">
+            <h3>用户信息字段</h3>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>用户名</th>
+                    <th>性别</th>
+                    <th>电话</th>
+                    <th>角色</th>
+                    <th>状态</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>admin</td><td>男</td><td>13800000001</td><td>admin</td><td>正常</td></tr>
+                  <tr><td>zhangsan</td><td>女</td><td>13800000002</td><td>user</td><td>正常</td></tr>
+                  <tr><td>lisi</td><td>男</td><td>13800000003</td><td>user</td><td>冻结</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="borrow-section">
+        <h2>借阅管理</h2>
+        <div class="actions">
+          <button class="btn primary">新建借阅记录</button>
+          <button class="btn soft">批量归还登记</button>
+          <button class="btn warn">超期提醒</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>读者</th>
+                <th>书名</th>
+                <th>借阅日期</th>
+                <th>应还日期</th>
+                <th>归还日期</th>
+                <th>状态</th>
+                <th>处理人</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>张明</td><td>深入理解Java虚拟机</td><td>2026-03-01</td><td>2026-03-21</td><td>2026-03-20</td><td>已归还</td><td>admin</td></tr>
+              <tr><td>李华</td><td>Vue.js 设计与实现</td><td>2026-03-14</td><td>2026-04-03</td><td>-</td><td>借阅中</td><td>admin</td></tr>
+              <tr><td>王雨</td><td>算法导论</td><td>-</td><td>-</td><td>-</td><td>预约中</td><td>admin</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="ai-section">
+        <h2>AI助手</h2>
+        <div class="assistant-layout">
+          <aside class="session-pane">
+            <h3 class="pane-title">会话管理</h3>
+            <button class="btn primary new-session">+ 新建对话</button>
+            <div class="session-list">
+              <div class="session-item">会话A：借阅趋势分析</div>
+              <div class="session-item">会话B：文档制度问答</div>
+              <div class="session-item">会话C：用户活跃统计</div>
+              <div class="session-item">会话D：热门借阅榜</div>
+            </div>
+            <div class="upload-box">
+              上传RAG知识库（PDF / DOCX，≤20MB）
+            </div>
+          </aside>
+          <section class="chat-pane">
+            <h3 class="pane-title">AI对话区域</h3>
+            <div class="chat-stream">
+              <div class="bubble user">请分析 2026 年第一季度借阅量最高的前十本书。</div>
+              <div class="bubble ai">已识别为热门借阅榜查询，可生成柱状图并返回结构化数据。</div>
+              <div class="bubble user">我上传了《馆藏制度.pdf》，预约规则是什么？</div>
+              <div class="bubble ai">根据检索到的文档内容，库存为0时可预约，按提交时间先后顺序排队。</div>
+            </div>
+            <div class="chat-input">
+              <input type="text" placeholder="输入问题，支持文档问答与数据分析..." />
+              <button class="btn primary">发送</button>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const menuButtons = document.querySelectorAll(".menu-item");
+    const sections = document.querySelectorAll(".section");
+
+    menuButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        menuButtons.forEach((item) => item.classList.remove("active"));
+        sections.forEach((section) => section.classList.remove("active"));
+        button.classList.add("active");
+        const target = document.getElementById(button.dataset.target);
+        if (target) {
+          target.classList.add("active");
+        }
+      });
+    });
+  </script>
+</body>
+</html>

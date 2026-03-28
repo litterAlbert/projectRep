@@ -1,0 +1,610 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>智慧图书管理系统 - 用户端</title>
+  <style>
+    :root {
+      --bg: #f5f8ff;
+      --panel: #ffffff;
+      --primary: #2563eb;
+      --primary-soft: #dbeafe;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #e2e8f0;
+      --ok: #10b981;
+      --warn: #f59e0b;
+      --shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Microsoft YaHei", "PingFang SC", "Segoe UI", sans-serif;
+      color: var(--text);
+      background: linear-gradient(135deg, #edf3ff 0%, #f6fbff 45%, #f7f8ff 100%);
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 240px 1fr;
+    }
+
+    .sidebar {
+      background: rgba(255, 255, 255, 0.92);
+      border-right: 1px solid var(--line);
+      backdrop-filter: blur(8px);
+      padding: 18px 14px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, #eff6ff, #eef2ff);
+      margin-bottom: 18px;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-weight: 700;
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .menu-item {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      text-align: left;
+      color: #334155;
+      padding: 11px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      margin-bottom: 6px;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .menu-item:hover {
+      background: #f1f5f9;
+      transform: translateX(2px);
+    }
+
+    .menu-item.active {
+      background: var(--primary-soft);
+      color: #1d4ed8;
+      font-weight: 600;
+    }
+
+    .main {
+      padding: 20px;
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .user-info {
+      background: var(--panel);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      border: 1px solid #edf2f7;
+      padding: 8px 12px;
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: linear-gradient(135deg, #06b6d4, #3b82f6);
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .section {
+      display: none;
+      background: var(--panel);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      border: 1px solid #edf2f7;
+      padding: 18px;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .section h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+    }
+
+    .search-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .search-form input {
+      border: 1px solid #dbe3ef;
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 9px 14px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .btn.primary {
+      color: #fff;
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+    }
+
+    .btn.borrow {
+      color: #065f46;
+      background: #d1fae5;
+    }
+
+    .btn.reserve {
+      color: #1e40af;
+      background: #dbeafe;
+    }
+
+    .btn.return {
+      color: #92400e;
+      background: #fef3c7;
+    }
+
+    .table-wrap {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      overflow: auto;
+    }
+
+    table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 11px 10px;
+      border-bottom: 1px solid #f1f5f9;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .tip {
+      margin-bottom: 10px;
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #f8fafc;
+      color: #475569;
+      font-size: 13px;
+      border: 1px dashed #cbd5e1;
+    }
+
+    .assistant-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 14px;
+      min-height: 560px;
+    }
+
+    .session-pane, .chat-pane {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      background: #fcfdff;
+    }
+
+    .pane-title {
+      margin: 0 0 10px;
+      font-size: 14px;
+    }
+
+    .new-session {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .session-list {
+      display: grid;
+      gap: 8px;
+      max-height: 420px;
+      overflow: auto;
+    }
+
+    .session-item {
+      border: 1px solid #dbeafe;
+      border-radius: 10px;
+      background: #eff6ff;
+      padding: 9px;
+      font-size: 13px;
+      color: #1d4ed8;
+    }
+
+    .upload-box {
+      margin-top: 10px;
+      border: 1px dashed #94a3b8;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 13px;
+      color: #475569;
+      background: #f8fafc;
+    }
+
+    .chat-stream {
+      height: 420px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      background: linear-gradient(180deg, #fff, #f8fbff);
+    }
+
+    .bubble {
+      max-width: 88%;
+      border-radius: 12px;
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .bubble.user {
+      justify-self: end;
+      background: #dbeafe;
+      color: #1e3a8a;
+    }
+
+    .bubble.ai {
+      justify-self: start;
+      background: #f1f5f9;
+      color: #334155;
+    }
+
+    .chat-input {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    .chat-input input {
+      border: 1px solid #dbe3ef;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    @media (max-width: 1200px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: relative;
+        height: auto;
+      }
+
+      .assistant-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .search-form {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">用</div>
+        <div>
+          <h1>用户中心</h1>
+          <p>Smart Library User</p>
+        </div>
+      </div>
+      <button class="menu-item active" data-target="borrow-section">图书借阅</button>
+      <button class="menu-item" data-target="return-section">归还图书</button>
+      <button class="menu-item" data-target="profile-section">个人信息</button>
+      <button class="menu-item" data-target="ai-section">AI助手</button>
+    </aside>
+
+    <main class="main">
+      <section class="topbar">
+        <div class="user-info">
+          <span class="avatar">U</span>
+          <span>普通用户 · zhangsan</span>
+        </div>
+      </section>
+
+      <section class="section active" id="borrow-section">
+        <h2>图书借阅</h2>
+        <div class="tip">请通过书名、作者或ISBN检索图书，系统会根据库存展示“借阅”或“预约”操作。</div>
+        <div class="search-form">
+          <input id="q-title" type="text" placeholder="书名" />
+          <input id="q-author" type="text" placeholder="作者" />
+          <input id="q-isbn" type="text" placeholder="ISBN" />
+          <button class="btn primary" id="search-btn">检索图书</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>书名</th>
+                <th>作者</th>
+                <th>ISBN</th>
+                <th>出版社</th>
+                <th>库存</th>
+                <th>馆藏位置</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="borrow-body">
+              <tr data-title="深入理解Java虚拟机" data-author="周志明" data-isbn="9787111641247">
+                <td>深入理解Java虚拟机</td>
+                <td>周志明</td>
+                <td>9787111641247</td>
+                <td>机械工业</td>
+                <td>6</td>
+                <td>A区-3层-JV-12</td>
+                <td><button class="btn borrow">借阅</button></td>
+              </tr>
+              <tr data-title="Vue.js 设计与实现" data-author="霍春阳" data-isbn="9787115545381">
+                <td>Vue.js 设计与实现</td>
+                <td>霍春阳</td>
+                <td>9787115545381</td>
+                <td>人民邮电</td>
+                <td>0</td>
+                <td>B区-2层-FE-08</td>
+                <td><button class="btn reserve">预约</button></td>
+              </tr>
+              <tr data-title="算法导论" data-author="Thomas" data-isbn="9787111407010">
+                <td>算法导论</td>
+                <td>Thomas</td>
+                <td>9787111407010</td>
+                <td>机械工业</td>
+                <td>2</td>
+                <td>A区-1层-CS-01</td>
+                <td><button class="btn borrow">借阅</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="return-section">
+        <h2>归还图书</h2>
+        <div class="tip">以下为当前借阅中的图书，点击“归还”即可发起归还流程。</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>书名</th>
+                <th>借阅日期</th>
+                <th>应还日期</th>
+                <th>逾期状态</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Vue.js 设计与实现</td>
+                <td>2026-03-14</td>
+                <td>2026-04-03</td>
+                <td style="color:#047857;">正常</td>
+                <td><button class="btn return">归还</button></td>
+              </tr>
+              <tr>
+                <td>计算机网络（第8版）</td>
+                <td>2026-02-21</td>
+                <td>2026-03-13</td>
+                <td style="color:#b45309;">已逾期</td>
+                <td><button class="btn return">归还</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="profile-section">
+        <h2>个人信息</h2>
+        <div class="tip">以下为当前登录用户的个人借阅记录。</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>姓名</th>
+                <th>用户名</th>
+                <th>手机号</th>
+                <th>当前借阅</th>
+                <th>累计借阅</th>
+                <th>最近借阅日期</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>张三</td>
+                <td>zhangsan</td>
+                <td>13800000002</td>
+                <td>2 本</td>
+                <td>37 本</td>
+                <td>2026-03-14</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="height:12px;"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>书名</th>
+                <th>借阅日期</th>
+                <th>应还日期</th>
+                <th>归还日期</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Vue.js 设计与实现</td>
+                <td>2026-03-14</td>
+                <td>2026-04-03</td>
+                <td>-</td>
+                <td style="color:#1d4ed8;">借阅中</td>
+              </tr>
+              <tr>
+                <td>深入理解Java虚拟机</td>
+                <td>2026-03-01</td>
+                <td>2026-03-21</td>
+                <td>2026-03-20</td>
+                <td style="color:#047857;">已归还</td>
+              </tr>
+              <tr>
+                <td>计算机网络（第8版）</td>
+                <td>2026-02-21</td>
+                <td>2026-03-13</td>
+                <td>-</td>
+                <td style="color:#b45309;">已逾期</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section" id="ai-section">
+        <h2>AI助手</h2>
+        <div class="assistant-layout">
+          <aside class="session-pane">
+            <h3 class="pane-title">会话管理</h3>
+            <button class="btn primary new-session">+ 新建对话</button>
+            <div class="session-list">
+              <div class="session-item">会话1：借阅推荐</div>
+              <div class="session-item">会话2：文档规则问答</div>
+              <div class="session-item">会话3：个人借阅统计</div>
+            </div>
+            <div class="upload-box">
+              上传RAG知识库（PDF / DOCX，≤20MB）
+            </div>
+          </aside>
+          <section class="chat-pane">
+            <h3 class="pane-title">AI对话区域</h3>
+            <div class="chat-stream">
+              <div class="bubble user">请推荐最近一个月热门且可借的前端开发书籍。</div>
+              <div class="bubble ai">已按借阅热度与库存筛选，建议优先借阅《深入理解Java虚拟机》《算法导论》。</div>
+              <div class="bubble user">我上传了《借阅须知.pdf》，我最多可以借几本？</div>
+              <div class="bubble ai">根据文档检索结果，普通用户同时最多可借 5 本，超出需先归还后再借。</div>
+            </div>
+            <div class="chat-input">
+              <input type="text" placeholder="请输入问题，支持文档问答与借阅咨询..." />
+              <button class="btn primary">发送</button>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const menuButtons = document.querySelectorAll(".menu-item");
+    const sections = document.querySelectorAll(".section");
+
+    menuButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        menuButtons.forEach((item) => item.classList.remove("active"));
+        sections.forEach((section) => section.classList.remove("active"));
+        button.classList.add("active");
+        const target = document.getElementById(button.dataset.target);
+        if (target) {
+          target.classList.add("active");
+        }
+      });
+    });
+
+    const searchBtn = document.getElementById("search-btn");
+    const titleInput = document.getElementById("q-title");
+    const authorInput = document.getElementById("q-author");
+    const isbnInput = document.getElementById("q-isbn");
+    const rows = document.querySelectorAll("#borrow-body tr");
+
+    searchBtn.addEventListener("click", () => {
+      const title = titleInput.value.trim().toLowerCase();
+      const author = authorInput.value.trim().toLowerCase();
+      const isbn = isbnInput.value.trim().toLowerCase();
+
+      rows.forEach((row) => {
+        const matchTitle = row.dataset.title.toLowerCase().includes(title);
+        const matchAuthor = row.dataset.author.toLowerCase().includes(author);
+        const matchIsbn = row.dataset.isbn.toLowerCase().includes(isbn);
+        const visible = matchTitle && matchAuthor && matchIsbn;
+        row.style.display = visible ? "" : "none";
+      });
+    });
+  </script>
+</body>
+</html>
