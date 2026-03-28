@@ -33,7 +33,9 @@ D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\impl\
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\impl\ReserveRecordServiceImpl.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\impl\UserServiceImpl.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\ReserveRecordService.java
+D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\SmartAssistant.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\UserService.java
+D:\86188\desktop\project\backend\src\main\java\com\example\backend\tools\DataAnalysisTool.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\tools\JwtTool.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\tools\OssTool.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\tools\UserContext.java

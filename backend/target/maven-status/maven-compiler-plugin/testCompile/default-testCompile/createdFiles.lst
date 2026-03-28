@@ -1,0 +1,4 @@
+com\example\backend\service\BorrowRecordServiceTest.class
+com\example\backend\service\BookServiceTest.class
+com\example\backend\service\ReserveRecordServiceTest.class
+com\example\backend\service\UserServiceTest.class

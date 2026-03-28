@@ -5,6 +5,5 @@ import java.util.Map;
 
 public interface AiService {
     String uploadAndProcessDoc(MultipartFile file) throws Exception;
-    String chatWithDoc(String sessionId, String message);
-    Map<String, Object> dataAnalysis(String query);
+    Map<String, Object> chat(String sessionId, String message);
 }

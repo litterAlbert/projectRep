@@ -11,6 +11,7 @@ import com.example.backend.tools.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Date;
 import java.util.List;
@@ -37,8 +38,8 @@ public class AiController {
     /**
      * 上传文档进行向量化
      */
-    @PostMapping("/upload")
-    public Result<String> uploadDoc(@RequestParam("file") MultipartFile file) {
+    @PostMapping(value = "/upload", consumes = "multipart/form-data")
+    public Result<String> uploadDoc(@RequestPart("file") MultipartFile file) {
         try {
             String url = aiService.uploadAndProcessDoc(file);
             return Result.success(url);
@@ -84,7 +85,7 @@ public class AiController {
      * 会话聊天
      */
     @PostMapping("/chat/{sessionId}")
-    public Result<String> chat(@PathVariable String sessionId, @RequestBody Map<String, String> body) {
+    public Result<Map<String, Object>> chat(@PathVariable String sessionId, @RequestBody Map<String, String> body) {
         String message = body.get("message");
         if (message == null || message.trim().isEmpty()) {
             return Result.error("消息不能为空");
@@ -99,29 +100,27 @@ public class AiController {
         chatMessageService.save(userMsg);
 
         // 调用AI服务
-        String aiResponse = aiService.chatWithDoc(sessionId, message);
+        Map<String, Object> aiResponse = aiService.chat(sessionId, message);
 
         // 记录AI消息
-        ChatMessage aiMsg = new ChatMessage();
-        aiMsg.setSessionId(sessionId);
-        aiMsg.setRole("ai");
-        aiMsg.setContent(aiResponse);
-        aiMsg.setCreatedAt(new Date());
-        chatMessageService.save(aiMsg);
+        try {
+            ChatMessage aiMsg = new ChatMessage();
+            aiMsg.setSessionId(sessionId);
+            aiMsg.setRole("ai");
+            // 将整个对象转为JSON字符串存储，如果内容过长可能会超出 TEXT 限制，但通常普通聊天不会。
+            String aiContent = new ObjectMapper().writeValueAsString(aiResponse);
+            // 避免超出内容字段的限制
+            if (aiContent != null && aiContent.length() > 65535) {
+                aiContent = aiContent.substring(0, 65535);
+            }
+            aiMsg.setContent(aiContent);
+            aiMsg.setCreatedAt(new Date());
+            chatMessageService.save(aiMsg);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return Result.success(aiResponse);
-    }
-
-    /**
-     * 数据分析 (自然语言转SQL及图表)
-     */
-    @PostMapping("/analysis")
-    public Result<Map<String, Object>> dataAnalysis(@RequestBody Map<String, String> body) {
-        String query = body.get("query");
-        if (query == null || query.trim().isEmpty()) {
-            return Result.error("查询不能为空");
-        }
-        return Result.success(aiService.dataAnalysis(query));
     }
 
     /**

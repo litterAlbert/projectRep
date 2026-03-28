@@ -25,12 +25,24 @@ mybatis-plus:
     map-underscore-to-camel-case: true
 
 langchain4j:
-  dashscope:
-    api-key: ${API-KEY}
+  open-ai:
     chat-model:
-      model-name: qwen3.5-plus
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api-key: ${API-KEY:sk-your-key}
+      model-name: qwen-plus
+    streaming-chat-model:
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api-key: ${API-KEY:sk-your-key}
+      model-name: qwen-plus
     embedding-model:
-      model-name: text-embedding-v4
+      base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+      api-key: ${API-KEY:sk-your-key}
+      model-name: text-embedding-v3
+      max-segments-per-batch: 10
+  community:
+    redis:
+      host: localhost
+      port: 6379
 
 aliyun:
   oss:

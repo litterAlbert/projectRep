@@ -1,79 +1,63 @@
 package com.example.backend.config;
 
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.dashscope.QwenChatModel;
-import dev.langchain4j.model.dashscope.QwenEmbeddingModel;
+import dev.langchain4j.community.store.embedding.redis.RedisEmbeddingStore;
+import dev.langchain4j.memory.chat.ChatMemoryProvider;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.store.embedding.EmbeddingStore;
-import dev.langchain4j.store.embedding.redis.RedisEmbeddingStore;
-import dev.langchain4j.data.segment.TextSegment;
-import org.springframework.beans.factory.annotation.Value;
+import dev.langchain4j.rag.content.retriever.ContentRetriever;
+import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
+import dev.langchain4j.store.memory.chat.ChatMemoryStore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * AI 模型配置
+ * AI RAG 与记忆配置
  * 时间: 2026-03-28
  */
 @Configuration
 public class AiConfig {
 
-    @Value("${langchain4j.dashscope.api-key:}")
-    private String apiKey;
+    @Autowired(required = false)
+    private ChatMemoryStore redisChatMemoryStore;
 
-    @Value("${spring.data.redis.host:localhost}")
-    private String redisHost;
+    @Autowired(required = false)
+    private EmbeddingModel embeddingModel;
 
-    @Value("${spring.data.redis.port:6379}")
-    private Integer redisPort;
+    @Autowired(required = false)
+    private RedisEmbeddingStore redisEmbeddingStore;
 
-    @Value("${spring.data.redis.password:}")
-    private String redisPassword;
-
+    /**
+     * 构建会话记忆提供者，基于 Redis 存储对话上下文
+     * 时间: 2026-03-28
+     */
     @Bean
-    public ChatLanguageModel chatLanguageModel() {
-        if (apiKey == null || apiKey.isEmpty()) {
-            return null; // For local tests without key
-        }
-        return QwenChatModel.builder()
-                .apiKey(apiKey)
-                .modelName("qwen-plus") // qwen-plus is usually aliased to qwen3.5-plus or similar
-                .build();
+    public ChatMemoryProvider chatMemoryProvider() {
+        return memoryId -> {
+            MessageWindowChatMemory.Builder builder = MessageWindowChatMemory.builder()
+                    .id(memoryId)
+                    .maxMessages(20);
+            if (redisChatMemoryStore != null) {
+                builder.chatMemoryStore(redisChatMemoryStore);
+            }
+            return builder.build();
+        };
     }
 
+    /**
+     * 构建向量数据库内容检索器，在 RAG 流程中负责查询匹配度最高的知识库片段
+     * 时间: 2026-03-28
+     */
     @Bean
-    public EmbeddingModel embeddingModel() {
-        if (apiKey == null || apiKey.isEmpty()) {
+    public ContentRetriever contentRetriever(){
+        if (redisEmbeddingStore == null || embeddingModel == null) {
             return null;
         }
-        return QwenEmbeddingModel.builder()
-                .apiKey(apiKey)
-                .modelName("text-embedding-v3") // text-embedding-v3
+        return EmbeddingStoreContentRetriever.builder()
+                .embeddingStore(redisEmbeddingStore)
+                .embeddingModel(embeddingModel)
+                .minScore(0.5) // 设置最低相似度阈值
+                .maxResults(3) // 每次最多返回3条相关文档片段
                 .build();
-    }
-
-    @Bean
-    public EmbeddingStore<TextSegment> embeddingStore() {
-        // Build redis URI
-        String url = "redis://";
-        if (redisPassword != null && !redisPassword.isEmpty()) {
-            url += ":" + redisPassword + "@";
-        }
-        url += redisHost + ":" + redisPort;
-
-        try {
-            return RedisEmbeddingStore.builder()
-                    .host(redisHost)
-                    .port(redisPort)
-                    // if password needed, can configure here or via URL if builder supports
-                    // Note: RedisEmbeddingStore builder might differ slightly in 0.35.0
-                    .indexName("library_docs_idx")
-                    .dimension(1024) // qwen text-embedding-v3 default dimension is 1024
-                    .build();
-        } catch (Exception e) {
-            // RedisSearch might not be available in standard redis, fallback gracefully or log
-            e.printStackTrace();
-            return null;
-        }
     }
 }

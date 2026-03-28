@@ -1,28 +1,23 @@
 package com.example.backend.service.impl;
 
 import com.example.backend.service.AiService;
+import com.example.backend.service.SmartAssistant;
 import com.example.backend.tools.OssTool;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.parser.apache.pdfbox.ApachePdfBoxDocumentParser;
 import dev.langchain4j.data.document.parser.apache.poi.ApachePoiDocumentParser;
-import dev.langchain4j.data.segment.TextSegment;
-import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
-import dev.langchain4j.data.document.splitter.DocumentSplitters;
-import dev.langchain4j.chain.ConversationalRetrievalChain;
-import dev.langchain4j.retriever.EmbeddingStoreRetriever;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * AI 服务实现类
@@ -35,17 +30,20 @@ public class AiServiceImpl implements AiService {
     private OssTool ossTool;
 
     @Autowired(required = false)
-    private ChatLanguageModel chatLanguageModel;
-
-    @Autowired(required = false)
     private EmbeddingModel embeddingModel;
 
     @Autowired(required = false)
-    private EmbeddingStore<TextSegment> embeddingStore;
+    @SuppressWarnings("rawtypes")
+    private EmbeddingStore embeddingStore;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    @Autowired(required = false)
+    private SmartAssistant smartAssistant;
 
+    /**
+     * 上传并处理文档（知识库录入）
+     * 时间: 2026-03-28
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public String uploadAndProcessDoc(MultipartFile file) throws Exception {
         // 1. 上传OSS
@@ -77,61 +75,51 @@ public class AiServiceImpl implements AiService {
         return url;
     }
 
+    /**
+     * AI 对话处理，支持图表类型识别
+     * 时间: 2026-03-28
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    public String chatWithDoc(String sessionId, String message) {
-        if (chatLanguageModel == null) return "AI 未配置";
-
-        ConversationalRetrievalChain chain = ConversationalRetrievalChain.builder()
-                .chatLanguageModel(chatLanguageModel)
-                .retriever(EmbeddingStoreRetriever.from(embeddingStore, embeddingModel, 5, 0.7))
-                .build();
-
-        return chain.execute(message);
-    }
-
-    @Override
-    public Map<String, Object> dataAnalysis(String query) {
-        if (chatLanguageModel == null) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("error", "AI 未配置");
-            return map;
+    public Map<String, Object> chat(String sessionId, String message) {
+        if (smartAssistant == null) {
+            Map<String, Object> res = new HashMap<>();
+            res.put("type", "text");
+            res.put("content", "AI 未配置或初始化失败");
+            return res;
         }
 
-        // 1. 询问AI生成SQL
-        String prompt = "你是一个图书管理系统的数据库助手。数据库包含以下表：\n" +
-                "user(id, username, role)\n" +
-                "book(id, title, author, stock, borrowed_count, reserved_count)\n" +
-                "borrow_record(id, user_id, book_id, borrow_date, return_date, status)\n" +
-                "reserve_record(id, user_id, book_id, reserve_date, status)\n" +
-                "请根据用户的问题，生成可以执行的MySQL查询语句。只返回SQL语句，不要任何解释，也不要Markdown格式的包裹：\n" +
-                "用户问题：" + query;
-        
-        String sql = chatLanguageModel.generate(prompt).replace("```sql", "").replace("```", "").trim();
-
-        // 2. 执行SQL
-        List<Map<String, Object>> data;
-        try {
-            data = jdbcTemplate.queryForList(sql);
-        } catch (Exception e) {
-            Map<String, Object> err = new HashMap<>();
-            err.put("error", "SQL执行失败: " + e.getMessage());
-            err.put("sql", sql);
-            return err;
+        // 预处理：判断用户是否要求生成特定图表
+        String prompt = message;
+        String chartType = null;
+        if (message.contains("折线图")) {
+            chartType = "line";
+        } else if (message.contains("柱状图")) {
+            chartType = "bar";
+        } else if (message.contains("饼图")) {
+            chartType = "pie";
         }
 
-        // 3. 询问AI生成前端需要的图表类型和数据结构
+        // 如果识别到图表需求，给 AI 补充明确的 JSON 格式指示
+        if (chartType != null) {
+            prompt += "\n（系统提示：用户要求生成" + chartType + "图表，请务必调用查询工具获取数据，并严格以JSON格式返回：{\"type\":\"chart\",\"chartType\":\"" + chartType + "\",\"data\":[...]}，不要返回任何多余的解释文本或 Markdown 标记）";
+        } else {
+            prompt += "\n（系统提示：如果是普通问答，请严格以JSON格式返回：{\"type\":\"text\",\"content\":\"你的回答\"}，不要返回多余文本或 Markdown 标记）";
+        }
+
         try {
-            String dataJson = new ObjectMapper().writeValueAsString(data);
-            String chartPrompt = "根据以下查询结果数据，判断适合展示哪种图表（柱状图 bar / 饼图 pie / 折线图 line）。\n" +
-                    "数据：" + dataJson + "\n" +
-                    "请返回一个JSON对象，包含 chartType (字符串，值为 bar, pie 或 line) 和 data (数组，直接是传入的数据)。只返回JSON，不要其他文字。";
+            // 调用声明式 AI 服务
+            String response = smartAssistant.chat(sessionId, prompt);
             
-            String jsonRes = chatLanguageModel.generate(chartPrompt).replace("```json", "").replace("```", "").trim();
-            return new ObjectMapper().readValue(jsonRes, Map.class);
+            // 清理可能的 markdown 代码块标记
+            response = response.replaceAll("```json", "").replaceAll("```", "").trim();
+            
+            ObjectMapper mapper = new ObjectMapper();
+            return (Map<String, Object>) mapper.readValue(response, Map.class);
         } catch (Exception e) {
             Map<String, Object> res = new HashMap<>();
-            res.put("chartType", "table");
-            res.put("data", data);
+            res.put("type", "text");
+            res.put("content", "处理失败: " + e.getMessage());
             return res;
         }
     }
