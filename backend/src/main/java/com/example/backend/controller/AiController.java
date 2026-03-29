@@ -82,6 +82,58 @@ public class AiController {
     }
 
     /**
+     * 删除会话
+     * 时间: 2026-03-29
+     */
+    @DeleteMapping("/session/{sessionId}")
+    public Result<String> deleteSession(@PathVariable String sessionId) {
+        UserContext.UserContextInfo info = UserContext.get();
+        if (info == null) return Result.error(401, "未登录");
+
+        ChatSession existing = chatSessionService.getById(sessionId);
+        if (existing == null) {
+            return Result.error("会话不存在");
+        }
+        
+        // 只有会话所有者可以删除
+        if (!existing.getUserId().equals(info.getUserId())) {
+            return Result.error(403, "无权操作");
+        }
+
+        // 删除会话及其关联消息
+        chatMessageService.remove(new QueryWrapper<ChatMessage>().eq("session_id", sessionId));
+        chatSessionService.removeById(sessionId);
+        
+        return Result.success("删除成功");
+    }
+
+    /**
+     * 重命名会话
+     * 时间: 2026-03-29
+     */
+    @PutMapping("/session/{sessionId}")
+    public Result<String> renameSession(@PathVariable String sessionId, @RequestBody ChatSession session) {
+        UserContext.UserContextInfo info = UserContext.get();
+        if (info == null) return Result.error(401, "未登录");
+
+        ChatSession existing = chatSessionService.getById(sessionId);
+        if (existing == null) {
+            return Result.error("会话不存在");
+        }
+        
+        // 只有会话所有者可以重命名
+        if (!existing.getUserId().equals(info.getUserId())) {
+            return Result.error(403, "无权操作");
+        }
+
+        existing.setTitle(session.getTitle());
+        existing.setUpdatedAt(new Date());
+        chatSessionService.updateById(existing);
+        
+        return Result.success("重命名成功");
+    }
+
+    /**
      * 会话聊天
      */
     @PostMapping("/chat/{sessionId}")

@@ -62,6 +62,10 @@ public class AiServiceImpl implements AiService {
             } else {
                 document = new ApachePoiDocumentParser().parse(is);
             }
+            // 确保将文件名加入到文档的元数据中，以便大模型在检索时能够获取到来源文档名
+            if (filename != null) {
+                document.metadata().put("file_name", filename);
+            }
         }
 
         // 3. 向量化并存储
@@ -102,9 +106,9 @@ public class AiServiceImpl implements AiService {
 
         // 如果识别到图表需求，给 AI 补充明确的 JSON 格式指示
         if (chartType != null) {
-            prompt += "\n（系统提示：用户要求生成" + chartType + "图表，请务必调用查询工具获取数据，并严格以JSON格式返回：{\"type\":\"chart\",\"chartType\":\"" + chartType + "\",\"data\":[...]}，不要返回任何多余的解释文本或 Markdown 标记）";
+            prompt += "\n（系统提示：用户要求生成" + chartType + "图表，请务必调用查询工具获取数据。并且为了前端渲染统一，请将返回数据中的计数字段的 key 统一转换为 'value'。严格以JSON格式返回：{\"type\":\"chart\",\"chartType\":\"" + chartType + "\",\"data\":[...]}，不要返回任何多余的解释文本或 Markdown 标记）";
         } else {
-            prompt += "\n（系统提示：如果是普通问答，请严格以JSON格式返回：{\"type\":\"text\",\"content\":\"你的回答\"}，不要返回多余文本或 Markdown 标记）";
+            prompt += "\n（系统提示：如果回答基于提供的文档知识，请返回 {\"type\":\"doc\",\"content\":\"回答\",\"source_nodes\":[\"文档名\"]}；如果是普通问答，请严格以JSON格式返回：{\"type\":\"text\",\"content\":\"你的回答\"}，不要返回多余文本或 Markdown 标记）";
         }
 
         try {

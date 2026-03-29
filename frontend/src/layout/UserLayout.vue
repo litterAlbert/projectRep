@@ -1,12 +1,10 @@
 <template>
   <div class="app-layout">
     <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark">用</div>
-        <div>
-          <h1>用户中心</h1>
-          <p>Smart Library User</p>
-        </div>
+      <div class="user-info">
+        <span class="avatar">U</span>
+        <span class="username-text">普通用户 · {{ userStore.userInfo.username }}</span>
+        <el-button link type="danger" @click="handleLogout">退出</el-button>
       </div>
       <div class="menu-title">我的图书馆</div>
       <router-link to="/user/borrow" class="menu-item" active-class="active">图书借阅</router-link>
@@ -16,14 +14,6 @@
     </aside>
 
     <main class="main-content">
-      <section class="topbar">
-        <div class="user-info">
-          <span class="avatar">U</span>
-          <span>普通用户 · {{ userStore.userInfo.username }}</span>
-          <el-button link type="danger" @click="handleLogout" style="margin-left: 10px;">退出</el-button>
-        </div>
-      </section>
-
       <div class="content-body">
         <router-view></router-view>
       </div>
@@ -67,37 +57,6 @@ const handleLogout = () => {
   flex-direction: column;
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px;
-  border-radius: var(--radius-md);
-  background: linear-gradient(135deg, #eff6ff, #eef2ff);
-  margin-bottom: 18px;
-}
-
-.brand-mark {
-  width: 38px;
-  height: 38px;
-  border-radius: 11px;
-  display: grid;
-  place-items: center;
-  color: #fff;
-  font-weight: 700;
-  background: linear-gradient(135deg, #2563eb, #4f46e5);
-}
-
-.brand h1 {
-  margin: 0;
-  font-size: 15px;
-}
-
-.brand p {
-  margin: 2px 0 0;
-  font-size: 12px;
-  color: var(--muted);
-}
 
 .menu-title {
   margin: 16px 10px 8px;
@@ -135,16 +94,9 @@ const handleLogout = () => {
 .main-content {
   padding: 20px;
   display: grid;
-  grid-template-rows: auto 1fr;
-  gap: 16px;
+  grid-template-rows: 1fr;
   height: 100vh;
   overflow: auto;
-}
-
-.topbar {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
 }
 
 .user-info {
@@ -152,12 +104,20 @@ const handleLogout = () => {
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   border: 1px solid #edf2f7;
-  padding: 8px 12px;
+  padding: 12px;
   display: flex;
   align-items: center;
   gap: 8px;
   font-size: 13px;
   color: var(--muted);
+  margin-bottom: 18px;
+}
+
+.username-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .avatar {
