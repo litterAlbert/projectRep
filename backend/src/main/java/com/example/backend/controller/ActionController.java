@@ -130,7 +130,7 @@ public class ActionController {
     }
 
     /**
-     * 获取个人借阅记录
+     * 获取个人借阅记录 (仅返回已归还的记录，并包含图书详细信息)
      *
      * @return 借阅记录列表
      */
@@ -141,6 +141,45 @@ public class ActionController {
 
         QueryWrapper<BorrowRecord> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("user_id", info.getUserId());
-        return Result.success(borrowRecordService.list(queryWrapper));
+        queryWrapper.eq("status", "RETURNED");
+        List<BorrowRecord> records = borrowRecordService.list(queryWrapper);
+
+        for (BorrowRecord record : records) {
+            Book book = bookService.getById(record.getBookId());
+            if (book != null) {
+                record.setTitle(book.getTitle());
+                record.setAuthor(book.getAuthor());
+                record.setPublisher(book.getPublisher());
+            }
+        }
+
+        return Result.success(records);
+    }
+
+    /**
+     * 获取个人未归还借阅记录 (状态为 BORROWED，并包含图书详细信息)
+     *
+     * @return 未归还借阅记录列表
+     */
+    @GetMapping("/borrow/unreturned/list")
+    public Result<List<BorrowRecord>> myUnreturnedBorrowList() {
+        UserContext.UserContextInfo info = UserContext.get();
+        if (info == null) return Result.error(401, "未登录");
+
+        QueryWrapper<BorrowRecord> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", info.getUserId());
+        queryWrapper.eq("status", "BORROWED");
+        List<BorrowRecord> records = borrowRecordService.list(queryWrapper);
+
+        for (BorrowRecord record : records) {
+            Book book = bookService.getById(record.getBookId());
+            if (book != null) {
+                record.setTitle(book.getTitle());
+                record.setAuthor(book.getAuthor());
+                record.setPublisher(book.getPublisher());
+            }
+        }
+
+        return Result.success(records);
     }
 }

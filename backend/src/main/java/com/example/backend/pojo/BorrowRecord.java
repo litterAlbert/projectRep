@@ -2,6 +2,7 @@ package com.example.backend.pojo;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 
 public class BorrowRecord {
     @TableId(type = IdType.AUTO)
@@ -13,6 +14,15 @@ public class BorrowRecord {
     private String status;
     private java.util.Date createdAt;
     private java.util.Date updatedAt;
+
+    @TableField(exist = false)
+    private String title;
+    
+    @TableField(exist = false)
+    private String author;
+    
+    @TableField(exist = false)
+    private String publisher;
 
     public BorrowRecord() {}
 
@@ -32,4 +42,11 @@ public class BorrowRecord {
     public void setCreatedAt(java.util.Date createdAt) { this.createdAt = createdAt; }
     public java.util.Date getUpdatedAt() { return this.updatedAt; }
     public void setUpdatedAt(java.util.Date updatedAt) { this.updatedAt = updatedAt; }
+    
+    public String getTitle() { return this.title; }
+    public void setTitle(String title) { this.title = title; }
+    public String getAuthor() { return this.author; }
+    public void setAuthor(String author) { this.author = author; }
+    public String getPublisher() { return this.publisher; }
+    public void setPublisher(String publisher) { this.publisher = publisher; }
 }

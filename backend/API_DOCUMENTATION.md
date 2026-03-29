@@ -303,7 +303,7 @@
   }
   ```
 
-### 3.4 获取个人借阅记录列表
+### 3.4 获取个人借阅记录列表 (仅已归还)
 - **URL**: `/action/borrow/list`
 - **Method**: `GET`
 - **响应 Body**:
@@ -316,11 +316,40 @@
         "id": 1,
         "userId": 1,
         "bookId": 1,
-        "borrowDate": "2026-03-28T10:00:00.000+00:00",
+        "title": "Java编程思想",
+        "author": "Bruce Eckel",
+        "publisher": "机械工业出版社",
+        "borrowDate": "2026-03-20T10:00:00.000+00:00",
+        "returnDate": "2026-03-28T10:00:00.000+00:00",
+        "status": "RETURNED",
+        "createdAt": "2026-03-20T10:00:00.000+00:00",
+        "updatedAt": "2026-03-28T10:00:00.000+00:00"
+      }
+    ]
+  }
+  ```
+
+### 3.5 获取个人未归还借阅记录列表
+- **URL**: `/action/borrow/unreturned/list`
+- **Method**: `GET`
+- **响应 Body**:
+  ```json
+  {
+    "code": 200,
+    "message": "success",
+    "data": [
+      {
+        "id": 2,
+        "userId": 1,
+        "bookId": 2,
+        "title": "Effective Java",
+        "author": "Joshua Bloch",
+        "publisher": "机械工业出版社",
+        "borrowDate": "2026-03-25T10:00:00.000+00:00",
         "returnDate": null,
         "status": "BORROWED",
-        "createdAt": "2026-03-28T10:00:00.000+00:00",
-        "updatedAt": "2026-03-28T10:00:00.000+00:00"
+        "createdAt": "2026-03-25T10:00:00.000+00:00",
+        "updatedAt": "2026-03-25T10:00:00.000+00:00"
       }
     ]
   }

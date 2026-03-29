@@ -1,7 +1,6 @@
 <template>
   <div class="profile">
     <h2>个人信息</h2>
-    <div class="tip">以下为当前登录用户的个人借阅记录。</div>
 
     <div class="user-card">
       <div class="info-item"><span>用户名：</span> {{ userStore.userInfo.username }}</div>
@@ -12,15 +11,11 @@
 
     <h3>历史借阅记录</h3>
     <el-table :data="tableData" style="width: 100%" v-loading="loading">
-      <el-table-column prop="bookTitle" label="书名" min-width="180" />
-      <el-table-column prop="borrowDate" label="借阅日期" width="150" />
-      <el-table-column prop="dueDate" label="应还日期" width="150" />
-      <el-table-column prop="returnDate" label="归还日期" width="150" />
-      <el-table-column prop="status" label="状态" width="100">
-        <template #default="{ row }">
-          <el-tag :type="getStatusType(row.status)">{{ row.status }}</el-tag>
-        </template>
-      </el-table-column>
+      <el-table-column prop="title" label="书名" min-width="100" />
+      <el-table-column prop="author" label="作者" min-width="100" align="center" />
+      <el-table-column prop="publisher" label="出版社" min-width="150" align="center" />
+      <el-table-column prop="borrowDate" label="借阅日期" width="180" align="center" :formatter="formatDate" />
+      <el-table-column prop="returnDate" label="归还日期" width="180" align="center" :formatter="formatDate" />
     </el-table>
   </div>
 </template>
@@ -29,20 +24,23 @@
 import { ref, onMounted } from 'vue'
 import request from '../../utils/request'
 import { useUserStore } from '../../stores/user'
+import dayjs from 'dayjs'
 
 const userStore = useUserStore()
 const loading = ref(false)
 const tableData = ref([])
 
 /**
- * 获取状态标签类型
- * @date 2026-03-28
+ * 格式化日期
+ * @param {Object} row 
+ * @param {Object} column 
+ * @param {String} cellValue 
+ * @returns {String}
+ * @date 2026-03-29
  */
-const getStatusType = (status) => {
-  if (status === '已归还') return 'success'
-  if (status === '借阅中') return 'primary'
-  if (status === '已逾期') return 'danger'
-  return ''
+const formatDate = (row, column, cellValue) => {
+  if (!cellValue) return '-'
+  return dayjs(cellValue).format('YYYY-MM-DD HH:mm:ss')
 }
 
 /**
@@ -56,11 +54,6 @@ const fetchRecords = async () => {
     tableData.value = res.data || []
   } catch (error) {
     console.error(error)
-    tableData.value = [
-      { id: 1, bookTitle: 'Vue.js 设计与实现', borrowDate: '2026-03-14', dueDate: '2026-04-03', returnDate: '-', status: '借阅中' },
-      { id: 2, bookTitle: '深入理解Java虚拟机', borrowDate: '2026-03-01', dueDate: '2026-03-21', returnDate: '2026-03-20', status: '已归还' },
-      { id: 3, bookTitle: '计算机网络（第8版）', borrowDate: '2026-02-21', dueDate: '2026-03-13', returnDate: '-', status: '已逾期' }
-    ]
   } finally {
     loading.value = false
   }
@@ -83,15 +76,7 @@ onMounted(() => {
   font-size: 16px;
 }
 
-.tip {
-  margin-bottom: 14px;
-  border-radius: 10px;
-  padding: 10px 12px;
-  background: #f8fafc;
-  color: #475569;
-  font-size: 13px;
-  border: 1px dashed #cbd5e1;
-}
+
 
 .user-card {
   border: 1px solid var(--line);

@@ -1,7 +1,6 @@
 <template>
   <div class="book-borrow">
     <h2>图书借阅</h2>
-    <div class="tip">请通过书名、作者或ISBN检索图书，系统会根据库存展示“借阅”或“预约”操作。</div>
     
     <div class="search-form">
       <el-input v-model="searchQuery.title" placeholder="书名" clearable></el-input>
@@ -133,15 +132,7 @@ onMounted(() => {
   font-size: 18px;
 }
 
-.tip {
-  margin-bottom: 14px;
-  border-radius: 10px;
-  padding: 10px 12px;
-  background: #f8fafc;
-  color: #475569;
-  font-size: 13px;
-  border: 1px dashed #cbd5e1;
-}
+
 
 .search-form {
   display: grid;
