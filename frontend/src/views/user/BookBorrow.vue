@@ -41,7 +41,7 @@ const searchQuery = reactive({
 
 /**
  * 检索图书
- * @date 2026-03-28
+ * @date 2026-03-30
  */
 const fetchBooks = async () => {
   loading.value = true
@@ -78,7 +78,7 @@ const handleSearch = () => {
 
 /**
  * 借阅图书
- * @date 2026-03-28
+ * @date 2026-03-30
  */
 const handleBorrow = (row) => {
   ElMessageBox.confirm(`确定借阅《${row.title}》吗？`, '提示', {
@@ -89,19 +89,18 @@ const handleBorrow = (row) => {
     try {
       const res = await request.post(`/action/borrow/${row.id}`)
       if (res.code === 200) {
-        ElMessage.success('借阅成功')
+        ElMessage.success(res.data || '借阅成功')
         fetchBooks()
       }
     } catch (error) {
-      ElMessage.success('模拟借阅成功')
-      row.stock--
+      console.error('借阅失败', error)
     }
   }).catch(() => {})
 }
 
 /**
  * 预约图书
- * @date 2026-03-28
+ * @date 2026-03-30
  */
 const handleReserve = (row) => {
   ElMessageBox.confirm(`该书库存为0，确定预约《${row.title}》吗？`, '提示', {
@@ -112,10 +111,11 @@ const handleReserve = (row) => {
     try {
       const res = await request.post(`/action/reserve/${row.id}`)
       if (res.code === 200) {
-        ElMessage.success('预约成功')
+        ElMessage.success(res.data || '预约成功')
+        fetchBooks()
       }
     } catch (error) {
-      ElMessage.success('模拟预约成功')
+      console.error('预约失败', error)
     }
   }).catch(() => {})
 }

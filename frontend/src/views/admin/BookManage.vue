@@ -3,14 +3,13 @@
     <h2>图书管理</h2>
     
     <div class="kpi">
-      <div class="kpi-item"><div class="label">馆藏总量</div><div class="value">12,860</div></div>
-      <div class="kpi-item"><div class="label">在馆可借</div><div class="value">8,432</div></div>
-      <div class="kpi-item"><div class="label">预约排队</div><div class="value">318</div></div>
+      <div class="kpi-item"><div class="label">馆藏总量</div><div class="value">{{ totalCollection }}</div></div>
+      <div class="kpi-item"><div class="label">在馆可借</div><div class="value">{{ availableStock }}</div></div>
+      <div class="kpi-item"><div class="label">预约排队</div><div class="value">{{ totalReserved }}</div></div>
     </div>
 
     <div class="actions">
       <el-button type="primary" @click="handleAdd">新增图书</el-button>
-      <el-button plain type="primary">批量导入</el-button>
       <div style="flex: 1"></div>
       <el-input v-model="searchKeyword" placeholder="输入书名/作者/ISBN" style="width: 250px" @keyup.enter="handleSearch">
         <template #append>
@@ -74,13 +73,37 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import request from '../../utils/request'
 
 const loading = ref(false)
 const tableData = ref([])
 const searchKeyword = ref('')
+
+/**
+ * 计算馆藏总量（所有书的库存+借出数量总和）
+ * @date 2026-03-30
+ */
+const totalCollection = computed(() => {
+  return tableData.value.reduce((sum, book) => sum + (book.stock || 0) + (book.borrowedCount || 0), 0)
+})
+
+/**
+ * 计算在馆可借数量（所有书的库存总和）
+ * @date 2026-03-30
+ */
+const availableStock = computed(() => {
+  return tableData.value.reduce((sum, book) => sum + (book.stock || 0), 0)
+})
+
+/**
+ * 计算预约排队数量（所有书的预约数量总和）
+ * @date 2026-03-30
+ */
+const totalReserved = computed(() => {
+  return tableData.value.reduce((sum, book) => sum + (book.reservedCount || 0), 0)
+})
 
 const dialogVisible = ref(false)
 const dialogType = ref('add')

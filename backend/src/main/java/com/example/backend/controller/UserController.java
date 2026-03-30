@@ -112,6 +112,7 @@ public class UserController {
 
     /**
      * 更新用户信息
+     * 增加时间：2026-03-30
      *
      * @param user 用户信息
      * @return 更新结果
@@ -126,6 +127,26 @@ public class UserController {
         if (!"admin".equals(info.getRole()) && !info.getUserId().equals(user.getId())) {
             return Result.error(403, "无权限");
         }
+
+        // 仅管理员可修改角色
+        if (!"admin".equals(info.getRole())) {
+            user.setRole(null);
+        }
+
+        // 处理密码，如果为空字符串则设置为null，避免更新为空密码
+        if (user.getPassword() != null && user.getPassword().trim().isEmpty()) {
+            user.setPassword(null);
+        }
+
+        // 检查用户名是否已存在
+        if (user.getUsername() != null && !user.getUsername().trim().isEmpty()) {
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("username", user.getUsername()).ne("id", user.getId());
+            if (userService.getOne(queryWrapper) != null) {
+                return Result.error("用户名已存在");
+            }
+        }
+
         userService.updateById(user);
         return Result.success("更新成功");
     }

@@ -23,6 +23,9 @@ public class BorrowRecord {
     
     @TableField(exist = false)
     private String publisher;
+    
+    @TableField(exist = false)
+    private String username;
 
     public BorrowRecord() {}
 
@@ -47,6 +50,24 @@ public class BorrowRecord {
     public void setTitle(String title) { this.title = title; }
     public String getAuthor() { return this.author; }
     public void setAuthor(String author) { this.author = author; }
+    /**
+     * 获取出版社
+     * 时间: 2026-03-30
+     */
     public String getPublisher() { return this.publisher; }
+    /**
+     * 设置出版社
+     * 时间: 2026-03-30
+     */
     public void setPublisher(String publisher) { this.publisher = publisher; }
+    /**
+     * 获取用户名
+     * 时间: 2026-03-30
+     */
+    public String getUsername() { return this.username; }
+    /**
+     * 设置用户名
+     * 时间: 2026-03-30
+     */
+    public void setUsername(String username) { this.username = username; }
 }

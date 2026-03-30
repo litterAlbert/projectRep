@@ -3,6 +3,8 @@ package com.example.backend.pojo;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.IdType;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+
 public class ReserveRecord {
     @TableId(type = IdType.AUTO)
     private Long id;
@@ -12,6 +14,12 @@ public class ReserveRecord {
     private String status;
     private java.util.Date createdAt;
     private java.util.Date updatedAt;
+
+    @TableField(exist = false)
+    private String title;
+
+    @TableField(exist = false)
+    private String username;
 
     public ReserveRecord() {}
 
@@ -29,4 +37,28 @@ public class ReserveRecord {
     public void setCreatedAt(java.util.Date createdAt) { this.createdAt = createdAt; }
     public java.util.Date getUpdatedAt() { return this.updatedAt; }
     public void setUpdatedAt(java.util.Date updatedAt) { this.updatedAt = updatedAt; }
+
+    /**
+     * 获取书名
+     * 时间: 2026-03-30
+     */
+    public String getTitle() { return this.title; }
+
+    /**
+     * 设置书名
+     * 时间: 2026-03-30
+     */
+    public void setTitle(String title) { this.title = title; }
+
+    /**
+     * 获取用户名
+     * 时间: 2026-03-30
+     */
+    public String getUsername() { return this.username; }
+
+    /**
+     * 设置用户名
+     * 时间: 2026-03-30
+     */
+    public void setUsername(String username) { this.username = username; }
 }
