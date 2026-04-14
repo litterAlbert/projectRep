@@ -505,11 +505,30 @@
   {
     "code": 200,
     "message": "success",
-    "data": "https://oss-url-to-uploaded-file.com/doc.pdf"
+    "data": {
+      "fileUrl": "https://oss-url-to-uploaded-file.com/doc.pdf",
+      "fileName": "Java编程思想.pdf"
+    }
   }
   ```
 
-### 4.2 新建会话
+### 4.2 删除上传的知识库文档
+
+- **URL**: `/ai/document`
+- **Method**: `DELETE`
+- **请求参数**:
+  - `fileUrl` (String, 必须，用于删除远端OSS文件)
+  - `fileName` (String, 必须，用于清理向量数据库)
+- **响应 Body**:
+  ```json
+  {
+    "code": 200,
+    "message": "success",
+    "data": "删除成功"
+  }
+  ```
+
+### 4.3 新建会话
 
 - **URL**: `/ai/session`
 - **Method**: `POST`
@@ -534,7 +553,7 @@
   }
   ```
 
-### 4.3 获取会话列表
+### 4.4 获取会话列表
 
 - **URL**: `/ai/session/list`
 - **Method**: `GET`
@@ -555,7 +574,7 @@
   }
   ```
 
-### 4.4 删除会话
+### 4.5 删除会话
 
 - **URL**: `/ai/session/{sessionId}`
 - **Method**: `DELETE`
@@ -587,7 +606,7 @@
   }
   ```
 
-### 4.6 会话聊天
+### 4.7 会话聊天
 
 - **URL**: `/ai/chat/{sessionId}`
 - **Method**: `POST`
@@ -645,7 +664,7 @@
   }
   ```
 
-### 4.7 获取会话历史记录
+### 4.8 获取会话历史记录
 
 - **URL**: `/ai/chat/{sessionId}/history`
 - **Method**: `GET`

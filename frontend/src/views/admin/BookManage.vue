@@ -172,15 +172,16 @@ const handleEdit = (row) => {
 }
 
 const handleDelete = async (row) => {
-  try {
+  //try {
     const res = await request.delete(`/book/${row.id}`)
     if (res.code === 200) {
       ElMessage.success('删除成功')
       fetchBooks()
     }
-  } catch (error) {
-    ElMessage.success('模拟删除成功')
-  }
+  //} 
+  /*catch (error) {
+    ElMessage.success('')
+  }*/
 }
 
 const submitForm = async () => {
@@ -219,41 +220,72 @@ onMounted(() => {
 <style scoped>
 .book-manage h2 {
   margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 18px;
+  margin-bottom: 24px;
+  font-size: 22px;
+  font-weight: 700;
   color: var(--text);
+  letter-spacing: -0.5px;
 }
 
 .kpi {
   display: grid;
   grid-template-columns: repeat(3, minmax(140px, 1fr));
-  gap: 14px;
-  margin-bottom: 20px;
+  gap: 20px;
+  margin-bottom: 24px;
 }
 
 .kpi-item {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  padding: 16px;
-  background: linear-gradient(135deg, #fff, #f8fbff);
+  border: 1px solid var(--line-solid);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, var(--primary-soft) 0%, transparent 70%);
+  opacity: 0.5;
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+}
+
+.kpi-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  border-color: #cbd5e1;
 }
 
 .kpi-item .label {
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--muted);
 }
 
 .kpi-item .value {
-  margin-top: 8px;
-  font-size: 26px;
+  margin-top: 12px;
+  font-size: 32px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--primary);
+  letter-spacing: -1px;
 }
 
 .actions {
   display: flex;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 12px;
+  margin-bottom: 20px;
   align-items: center;
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-solid);
 }
 </style>

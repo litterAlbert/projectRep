@@ -93,16 +93,17 @@ const handleReturn = (row) => {
     cancelButtonText: '取消',
     type: 'warning'
   }).then(async () => {
-    try {
-      const res = await request.post(`/action/return/${row.bookId}`)
+    //try {
+      const res = await request.post(`/action/return/${row.id}`)
       if (res.code === 200) {
         ElMessage.success('归还成功')
         fetchRecords()
       }
-    } catch (error) {
+    //} 
+    /*catch (error) {
       ElMessage.success('模拟归还成功')
       tableData.value = tableData.value.filter(item => item.id !== row.id)
-    }
+    }*/
   }).catch(() => {})
 }
 

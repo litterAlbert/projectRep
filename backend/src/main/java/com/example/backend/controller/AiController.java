@@ -37,15 +37,34 @@ public class AiController {
 
     /**
      * 上传文档进行向量化
+     * 时间: 2026-03-28
      */
     @PostMapping(value = "/upload", consumes = "multipart/form-data")
-    public Result<String> uploadDoc(@RequestPart("file") MultipartFile file) {
+    public Result<Map<String, String>> uploadDoc(@RequestPart("file") MultipartFile file) {
         try {
             String url = aiService.uploadAndProcessDoc(file);
-            return Result.success(url);
+            Map<String, String> data = new java.util.HashMap<>();
+            data.put("fileUrl", url);
+            data.put("fileName", file.getOriginalFilename());
+            return Result.success(data);
         } catch (Exception e) {
             e.printStackTrace();
             return Result.error("文档处理失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 删除上传的知识库文档
+     * 时间: 2026-04-14
+     */
+    @DeleteMapping("/document")
+    public Result<String> deleteDoc(@RequestParam("fileUrl") String fileUrl, @RequestParam("fileName") String fileName) {
+        try {
+            aiService.deleteDoc(fileUrl, fileName);
+            return Result.success("删除成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("删除文档失败: " + e.getMessage());
         }
     }
 

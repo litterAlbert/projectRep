@@ -58,4 +58,34 @@ public class OssTool {
             }
         }
     }
+
+    /**
+     * 删除文件
+     *
+     * @param fileUrl 文件访问URL
+     * 时间: 2026-04-14
+     */
+    public void delete(String fileUrl) {
+        if (endpoint == null || endpoint.isEmpty() || fileUrl == null || fileUrl.isEmpty() || fileUrl.startsWith("http://localhost/")) {
+            // 本地测试或者无效URL直接返回
+            return;
+        }
+        
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+        try {
+            // 从 URL 中提取文件名
+            // 例如: https://bucket-name.endpoint/fileName
+            String prefix = "https://" + bucketName + "." + endpoint.replace("https://", "").replace("http://", "") + "/";
+            if (fileUrl.startsWith(prefix)) {
+                String fileName = fileUrl.substring(prefix.length());
+                ossClient.deleteObject(bucketName, fileName);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (ossClient != null) {
+                ossClient.shutdown();
+            }
+        }
+    }
 }

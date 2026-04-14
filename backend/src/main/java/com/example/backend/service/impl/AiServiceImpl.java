@@ -10,6 +10,7 @@ import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
+import static dev.langchain4j.store.embedding.filter.MetadataFilterBuilder.metadataKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -77,6 +78,63 @@ public class AiServiceImpl implements AiService {
         ingestor.ingest(document);
 
         return url;
+    }
+
+    /**
+     * 删除知识库文档
+     * 时间: 2026-04-14
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Override
+    public void deleteDoc(String fileUrl, String fileName) {
+        // 从 OSS 删除
+        if (fileUrl != null && !fileUrl.isEmpty()) {
+            ossTool.delete(fileUrl);
+        }
+
+        // 从向量数据库中删除
+        if (embeddingStore != null && fileName != null && !fileName.isEmpty()) {
+            try {
+                // 注意：在部分 Spring Data Redis / Langchain4j 底层封装中，参数如果本身没有特殊结构可能不需要被外层正则表达式深度转义
+                // 如果发现查询删除不到，可直接尝试使用 fileName 原文进行删除，底层的 builder 可能会进行安全拼接
+                // 我们优先使用转义，并忽略错误
+                String escapedFileName = escapeRedisSearch(fileName);
+                embeddingStore.removeAll(metadataKey("file_name").isEqualTo(escapedFileName));
+            } catch (Exception e) {
+                // 忽略索引不存在的报错（说明向量库中还没有任何数据）
+                if (e.getMessage() != null && e.getMessage().contains("no such index")) {
+                    // index not found, safely ignore
+                } else if (e.getMessage() != null && e.getMessage().contains("wrong number of arguments for 'del' command")) {
+                    // 如果搜索到了0个结果，底层 redis.clients.jedis.UnifiedJedis.del() 可能会报错，安全忽略
+                } else {
+                    e.printStackTrace();
+                }
+            }
+
+            // 为了防止上面的转义导致找不到对应数据，这里补充执行一次不带转义的原文删除
+            // 根据上面的测试，Jedis 底层如果没查到数据去执行 DEL 就会抛出 wrong number of arguments for 'del' command
+            try {
+                embeddingStore.removeAll(metadataKey("file_name").isEqualTo(fileName));
+            } catch (Exception e) {
+                if (e.getMessage() != null && (e.getMessage().contains("no such index") || e.getMessage().contains("wrong number of arguments for 'del' command"))) {
+                    // safely ignore
+                } else {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * 转义 RedisSearch 字符串中的特殊字符
+     * @param input 原始字符串
+     * @return 转义后的字符串
+     * 时间: 2026-04-14
+     */
+    private String escapeRedisSearch(String input) {
+        if (input == null) return null;
+        // Redis Search 要求对标点符号进行转义，最稳妥的方式是对所有非字母数字的字符进行转义
+        return input.replaceAll("([^a-zA-Z0-9])", "\\\\$1");
     }
 
     /**

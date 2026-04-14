@@ -431,6 +431,20 @@ const beforeUpload = (file) => {
 const handleUploadSuccess = (res) => {
   if (res.code === 200) {
     ElMessage.success('文件上传成功')
+    
+    // 同步保存到知识库列表 (localStorage)
+    try {
+      const stored = localStorage.getItem('knowledge_docs')
+      const docList = stored ? JSON.parse(stored) : []
+      const newDoc = {
+        ...res.data,
+        uploadTime: new Date().toLocaleString()
+      }
+      docList.unshift(newDoc)
+      localStorage.setItem('knowledge_docs', JSON.stringify(docList))
+    } catch (e) {
+      console.error('保存文档到知识库失败', e)
+    }
   } else {
     ElMessage.error(res.message || '上传失败')
   }

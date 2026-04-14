@@ -239,34 +239,54 @@ onMounted(() => {
 <style scoped>
 .user-manage h2 {
   margin-top: 0;
-  margin-bottom: 20px;
-  font-size: 18px;
+  margin-bottom: 24px;
+  font-size: 22px;
+  font-weight: 700;
   color: var(--text);
+  letter-spacing: -0.5px;
 }
 
 .layout-stack {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 24px;
 }
 
 .card {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  padding: 14px;
-  background: linear-gradient(135deg, #fff, #f8fbff);
+  border: 1px solid var(--line-solid);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow);
 }
 
 .card h3 {
-  margin: 0 0 10px;
-  font-size: 15px;
+  margin: 0 0 16px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card h3::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  background: var(--primary);
+  border-radius: 2px;
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
 }
 
 .card-header h3 {
@@ -275,26 +295,50 @@ onMounted(() => {
 
 .kpi {
   display: grid;
-  grid-template-columns: repeat(3, minmax(100px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(3, minmax(140px, 1fr));
+  gap: 20px;
 }
 
 .kpi-item {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  padding: 12px;
-  background: #f8fbff;
+  border: 1px solid var(--line-solid);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  background: #ffffff;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.kpi-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, var(--primary-soft) 0%, transparent 70%);
+  opacity: 0.5;
+  border-radius: 50%;
+  transform: translate(30%, -30%);
+}
+
+.kpi-item:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow: var(--shadow-sm);
 }
 
 .kpi-item .label {
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 500;
   color: var(--muted);
 }
 
 .kpi-item .value {
-  margin-top: 6px;
-  font-size: 24px;
+  margin-top: 12px;
+  font-size: 32px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--primary);
+  letter-spacing: -1px;
 }
 </style>

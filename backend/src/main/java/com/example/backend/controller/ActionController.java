@@ -96,7 +96,6 @@ public class ActionController {
         BorrowRecord record = borrowRecordService.getById(recordId);
         if (record == null) return Result.error("记录不存在");
         if (!"BORROWED".equals(record.getStatus())) return Result.error("该书已归还");
-        
         // 如果不是管理员，且不是自己的记录，拒绝
         if (!"admin".equals(info.getRole()) && !record.getUserId().equals(info.getUserId())) {
             return Result.error(403, "无权限");

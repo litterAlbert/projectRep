@@ -43,6 +43,10 @@ langchain4j:
     redis:
       host: localhost
       port: 6379
+      dimension: 1024
+      metadata-keys:
+        - file_name
+        - file_url
 
 aliyun:
   oss:

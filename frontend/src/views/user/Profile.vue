@@ -67,32 +67,77 @@ onMounted(() => {
 <style scoped>
 .profile h2, .profile h3 {
   margin-top: 0;
-  margin-bottom: 14px;
-  font-size: 18px;
+  margin-bottom: 24px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.5px;
 }
 
 .profile h3 {
-  margin-top: 20px;
-  font-size: 16px;
+  margin-top: 32px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-
+.profile h3::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 18px;
+  background: var(--primary);
+  border-radius: 2px;
+}
 
 .user-card {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  padding: 16px;
-  background: linear-gradient(135deg, #fff, #f8fbff);
+  border: 1px solid var(--line-solid);
+  border-radius: var(--radius-xl);
+  padding: 24px 32px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
+  gap: 24px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.user-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+}
+
+.user-card::before {
+  content: '';
+  position: absolute;
+  top: -50px;
+  right: -50px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, var(--primary-soft) 0%, transparent 70%);
+  opacity: 0.4;
+  border-radius: 50%;
 }
 
 .info-item {
-  font-size: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 1;
 }
 
 .info-item span {
+  font-size: 13px;
+  font-weight: 500;
   color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 </style>

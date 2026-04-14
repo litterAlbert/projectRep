@@ -14,7 +14,7 @@ import dev.langchain4j.service.spring.AiServiceWiringMode;
         wiringMode = AiServiceWiringMode.EXPLICIT,
         chatModel = "openAiChatModel",
         chatMemoryProvider = "chatMemoryProvider",
-        contentRetriever = "contentRetriever",
+        contentRetriever = "contentRetriever",//向量数据库检索对象
         tools = "dataAnalysisTool"
 )
 public interface SmartAssistant {
