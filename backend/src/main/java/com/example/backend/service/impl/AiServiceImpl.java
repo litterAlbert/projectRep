@@ -16,6 +16,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import redis.clients.jedis.JedisPooled;
+import redis.clients.jedis.search.Query;
+import redis.clients.jedis.search.SearchResult;
+
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +42,13 @@ public class AiServiceImpl implements AiService {
     private EmbeddingStore embeddingStore;
 
     @Autowired(required = false)
+    private JedisPooled jedisPooled;
+
+    @Autowired(required = false)
     private SmartAssistant smartAssistant;
+
+    // 手动创建一个供补偿删除用的静态 JedisPooled（仅用于排查/备用）
+    private JedisPooled fallbackJedisPooled = new JedisPooled("localhost", 6379);
 
     /**
      * 上传并处理文档（知识库录入）
@@ -56,8 +66,8 @@ public class AiServiceImpl implements AiService {
 
         // 2. 提取文本
         Document document;
+        String filename = file.getOriginalFilename();
         try (InputStream is = file.getInputStream()) {
-            String filename = file.getOriginalFilename();
             if (filename != null && filename.toLowerCase().endsWith(".pdf")) {
                 document = new ApachePdfBoxDocumentParser().parse(is);
             } else {
@@ -66,6 +76,10 @@ public class AiServiceImpl implements AiService {
             // 确保将文件名加入到文档的元数据中，以便大模型在检索时能够获取到来源文档名
             if (filename != null) {
                 document.metadata().put("file_name", filename);
+                // 移除可能引起干扰的 PDF 内置元数据，防止大模型将 title 误认为来源文件名
+                document.metadata().remove("title");
+                document.metadata().remove("author");
+                document.metadata().remove("source");
             }
         }
 
@@ -95,46 +109,57 @@ public class AiServiceImpl implements AiService {
         // 从向量数据库中删除
         if (embeddingStore != null && fileName != null && !fileName.isEmpty()) {
             try {
-                // 注意：在部分 Spring Data Redis / Langchain4j 底层封装中，参数如果本身没有特殊结构可能不需要被外层正则表达式深度转义
-                // 如果发现查询删除不到，可直接尝试使用 fileName 原文进行删除，底层的 builder 可能会进行安全拼接
-                // 我们优先使用转义，并忽略错误
-                String escapedFileName = escapeRedisSearch(fileName);
-                embeddingStore.removeAll(metadataKey("file_name").isEqualTo(escapedFileName));
-            } catch (Exception e) {
-                // 忽略索引不存在的报错（说明向量库中还没有任何数据）
-                if (e.getMessage() != null && e.getMessage().contains("no such index")) {
-                    // index not found, safely ignore
-                } else if (e.getMessage() != null && e.getMessage().contains("wrong number of arguments for 'del' command")) {
-                    // 如果搜索到了0个结果，底层 redis.clients.jedis.UnifiedJedis.del() 可能会报错，安全忽略
+                // 确保我们一定有一个可用的 Jedis 客户端
+                JedisPooled currentJedis = (jedisPooled != null) ? jedisPooled : fallbackJedisPooled;
+                
+                if (currentJedis != null) {
+                    System.out.println("【向量删除排查】开始尝试删除文件: " + fileName);
+                    long count = 0;
+                    java.util.List<String> keysToDelete = new java.util.ArrayList<>();
+                    
+                    java.util.Set<String> allKeys = currentJedis.keys("embedding:*");
+                    System.out.println("【向量删除排查】在 Redis 中找到了 " + (allKeys != null ? allKeys.size() : 0) + " 个以 'embedding:' 开头的 Key");
+                    
+                    if (allKeys != null) {
+                        for (String key : allKeys) {
+                             String storedName = null;
+                             try {
+                                 storedName = String.valueOf(currentJedis.jsonGet(key));
+                             } catch (Exception e) {
+                                 try {
+                                     storedName = currentJedis.get(key);
+                                 } catch (Exception e2) {
+                                     try {
+                                         storedName = String.valueOf(currentJedis.hgetAll(key));
+                                     } catch (Exception e3) {
+                                         System.err.println("【向量删除排查】Key " + key + " 无法解析任何内容: " + e3.getMessage());
+                                     }
+                                 }
+                             }
+                             
+                             if (storedName != null && storedName.contains(fileName)) {
+                                 keysToDelete.add(key);
+                                 count++;
+                             }
+                        }
+                    }
+                    
+                    System.out.println("【向量删除排查】经过匹配，包含文件名 '" + fileName + "' 的记录共有 " + keysToDelete.size() + " 条");
+                    
+                    if (!keysToDelete.isEmpty()) {
+                        currentJedis.del(keysToDelete.toArray(new String[0]));
+                        System.out.println("成功删除了文档 " + fileName + " 的 " + count + " 条向量记录");
+                    } else {
+                        System.out.println("未找到文档 " + fileName + " 的向量记录，可能匹配规则有问题或确实不存在");
+                    }
                 } else {
-                    e.printStackTrace();
+                    System.err.println("【向量删除排查】没有可用的 JedisPooled 实例，删除被跳过！");
                 }
-            }
-
-            // 为了防止上面的转义导致找不到对应数据，这里补充执行一次不带转义的原文删除
-            // 根据上面的测试，Jedis 底层如果没查到数据去执行 DEL 就会抛出 wrong number of arguments for 'del' command
-            try {
-                embeddingStore.removeAll(metadataKey("file_name").isEqualTo(fileName));
             } catch (Exception e) {
-                if (e.getMessage() != null && (e.getMessage().contains("no such index") || e.getMessage().contains("wrong number of arguments for 'del' command"))) {
-                    // safely ignore
-                } else {
-                    e.printStackTrace();
-                }
+                System.err.println("【向量删除排查】发生致命错误: " + e.getMessage());
+                e.printStackTrace();
             }
         }
-    }
-
-    /**
-     * 转义 RedisSearch 字符串中的特殊字符
-     * @param input 原始字符串
-     * @return 转义后的字符串
-     * 时间: 2026-04-14
-     */
-    private String escapeRedisSearch(String input) {
-        if (input == null) return null;
-        // Redis Search 要求对标点符号进行转义，最稳妥的方式是对所有非字母数字的字符进行转义
-        return input.replaceAll("([^a-zA-Z0-9])", "\\\\$1");
     }
 
     /**
@@ -166,7 +191,7 @@ public class AiServiceImpl implements AiService {
         if (chartType != null) {
             prompt += "\n（系统提示：用户要求生成" + chartType + "图表，请务必调用查询工具获取数据。并且为了前端渲染统一，请将返回数据中的计数字段的 key 统一转换为 'value'。严格以JSON格式返回：{\"type\":\"chart\",\"chartType\":\"" + chartType + "\",\"data\":[...]}，不要返回任何多余的解释文本或 Markdown 标记）";
         } else {
-            prompt += "\n（系统提示：如果回答基于提供的文档知识，请返回 {\"type\":\"doc\",\"content\":\"回答\",\"source_nodes\":[\"文档名\"]}；如果是普通问答，请严格以JSON格式返回：{\"type\":\"text\",\"content\":\"你的回答\"}，不要返回多余文本或 Markdown 标记）";
+            prompt += "\n（系统提示：如果回答基于提供的文档知识，请返回 {\"type\":\"doc\",\"content\":\"回答\",\"source_nodes\":[\"文档名\"]},（注意：来源source_nodes必须提取每段内容开头包含的 file_name 字段中的名字)；如果是普通问答，请严格以JSON格式返回：{\"type\":\"text\",\"content\":\"你的回答\"}，不要返回多余文本或 Markdown 标记）";
         }
 
         try {

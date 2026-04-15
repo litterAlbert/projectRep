@@ -6,10 +6,13 @@ import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
+import dev.langchain4j.rag.content.injector.ContentInjector;
+import dev.langchain4j.rag.content.injector.DefaultContentInjector;
 import dev.langchain4j.store.memory.chat.ChatMemoryStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import java.util.Arrays;
 
 /**
  * AI RAG 与记忆配置
@@ -58,6 +61,24 @@ public class AiConfig {
                 .embeddingModel(embeddingModel)
                 .minScore(0.5) // 设置最低相似度阈值
                 .maxResults(3) // 每次最多返回3条相关文档片段
+                .build();
+    }
+
+    /**
+     * 配置 RetrievalAugmentor，自定义检索后的处理逻辑
+     * 将元数据中的 file_name 拼接到正文前，并交给大模型
+     */
+    @Bean
+    public dev.langchain4j.rag.RetrievalAugmentor retrievalAugmentor(ContentRetriever contentRetriever) {
+        if (contentRetriever == null) return null;
+        
+        ContentInjector contentInjector = DefaultContentInjector.builder()
+                .metadataKeysToInclude(Arrays.asList("file_name"))
+                .build();
+
+        return dev.langchain4j.rag.DefaultRetrievalAugmentor.builder()
+                .contentRetriever(contentRetriever)
+                .contentInjector(contentInjector)
                 .build();
     }
 }
