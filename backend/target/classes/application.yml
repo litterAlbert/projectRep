@@ -42,7 +42,7 @@ langchain4j:
     embedding-model:
       base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
       api-key: ${API-KEY:sk-your-key}
-      model-name: text-embedding-v3
+      model-name: text-embedding-v4
       max-segments-per-batch: 10
   community:
     redis:

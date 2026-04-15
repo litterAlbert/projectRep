@@ -30,8 +30,12 @@ public class AiConfig {
     @Autowired(required = false)
     private RedisEmbeddingStore redisEmbeddingStore;
 
+    @Autowired(required = false)
+    private redis.clients.jedis.JedisPooled jedisPooled;
+
     /**
      * 构建会话记忆提供者，基于 Redis 存储对话上下文
+
      * 时间: 2026-03-28
      */
     @Bean
@@ -48,20 +52,33 @@ public class AiConfig {
     }
 
     /**
-     * 构建向量数据库内容检索器，在 RAG 流程中负责查询匹配度最高的知识库片段
-     * 时间: 2026-03-28
+     * 构建混合检索器：融合向量检索与关键字检索，采用 RRF 排序
+     * 时间: 2026-04-15
      */
     @Bean
     public ContentRetriever contentRetriever(){
         if (redisEmbeddingStore == null || embeddingModel == null) {
             return null;
         }
-        return EmbeddingStoreContentRetriever.builder()
+        
+        // 1. 创建基础的向量检索器
+        ContentRetriever vectorRetriever = EmbeddingStoreContentRetriever.builder()
                 .embeddingStore(redisEmbeddingStore)
                 .embeddingModel(embeddingModel)
                 .minScore(0.5) // 设置最低相似度阈值
-                .maxResults(3) // 每次最多返回3条相关文档片段
+                .maxResults(5) // 每次最多返回3条相关文档片段
                 .build();
+                
+        // 2. 由于底层使用的是 RedisSearch，我们强制创建 JedisPooled 客户端，确保混合检索功能可用
+        redis.clients.jedis.JedisPooled activeJedisPooled = this.jedisPooled;
+        if (activeJedisPooled == null) {
+            // 根据 application.yml 中的默认配置（host: localhost, port: 6379）手动创建 fallback 客户端
+            //System.out.println("未自动注入 JedisPooled，将手动创建连接以开启混合检索器");
+            activeJedisPooled = new redis.clients.jedis.JedisPooled("localhost", 6379);
+        }
+        
+        //System.out.println("混合检索器");
+        return new com.example.backend.tools.HybridContentRetriever(vectorRetriever, activeJedisPooled, 5, 60);
     }
 
     /**

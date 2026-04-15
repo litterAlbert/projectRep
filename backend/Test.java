@@ -1,1 +1,0 @@
-import dev.langchain4j.store.embedding.EmbeddingStore; import dev.langchain4j.store.embedding.filter.Filter; import static dev.langchain4j.store.embedding.filter.MetadataFilterBuilder.metadataKey; public class Test { public void test(EmbeddingStore store) { store.removeAll(metadataKey("file_name").isEqualTo("123")); } }

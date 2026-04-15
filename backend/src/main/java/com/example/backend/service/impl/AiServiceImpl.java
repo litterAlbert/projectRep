@@ -6,7 +6,6 @@ import com.example.backend.tools.OssTool;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.parser.apache.pdfbox.ApachePdfBoxDocumentParser;
 import dev.langchain4j.data.document.parser.apache.poi.ApachePoiDocumentParser;
-import dev.langchain4j.data.document.splitter.DocumentSplitters;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
@@ -85,7 +84,7 @@ public class AiServiceImpl implements AiService {
 
         // 3. 向量化并存储
         EmbeddingStoreIngestor ingestor = EmbeddingStoreIngestor.builder()
-                .documentSplitter(DocumentSplitters.recursive(500, 50))
+                .documentSplitter(new com.example.backend.tools.SemanticDocumentSplitter(embeddingModel, 0.3))
                 .embeddingModel(embeddingModel)
                 .embeddingStore(embeddingStore)
                 .build();
