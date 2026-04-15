@@ -90,7 +90,7 @@ public class AiConfig {
         if (contentRetriever == null) return null;
         
         ContentInjector contentInjector = DefaultContentInjector.builder()
-                .metadataKeysToInclude(Arrays.asList("file_name"))
+                .metadataKeysToInclude(Arrays.asList("file_name", "uploader_role"))
                 .build();
 
         return dev.langchain4j.rag.DefaultRetrievalAugmentor.builder()

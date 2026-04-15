@@ -80,6 +80,12 @@ public class AiServiceImpl implements AiService {
                 document.metadata().remove("author");
                 document.metadata().remove("source");
             }
+            
+            // 时间: 2026-04-15 新增：将上传者角色放入元数据，用于处理知识库冲突时的优先级
+            com.example.backend.tools.UserContext.UserContextInfo info = com.example.backend.tools.UserContext.get();
+            if (info != null && info.getRole() != null) {
+                document.metadata().put("uploader_role", info.getRole());
+            }
         }
 
         // 3. 向量化并存储

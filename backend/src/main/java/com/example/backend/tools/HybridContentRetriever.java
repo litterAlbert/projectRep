@@ -63,7 +63,12 @@ public class HybridContentRetriever implements ContentRetriever {
             String text = c.textSegment().text();
             contentMap.putIfAbsent(text, c);
             double currentScore = rrfScores.getOrDefault(text, 0.0);
-            rrfScores.put(text, currentScore + 1.0 / (rrfK + rank));
+            double boost = 1.0;
+            // 时间: 2026-04-15 新增管理员知识库优先级提升
+            if ("admin".equals(c.textSegment().metadata().getString("uploader_role"))) {
+                boost = 100.0; // 管理员知识库优先级更高
+            }
+            rrfScores.put(text, currentScore + (1.0 / (rrfK + rank)) * boost);
             rank++;
         }
 
@@ -73,7 +78,11 @@ public class HybridContentRetriever implements ContentRetriever {
             String text = c.textSegment().text();
             contentMap.putIfAbsent(text, c);
             double currentScore = rrfScores.getOrDefault(text, 0.0);
-            rrfScores.put(text, currentScore + 1.0 / (rrfK + rank));
+            double boost = 1.0;
+            if ("admin".equals(c.textSegment().metadata().getString("uploader_role"))) {
+                boost = 100.0; // 管理员知识库优先级更高
+            }
+            rrfScores.put(text, currentScore + (1.0 / (rrfK + rank)) * boost);
             rank++;
         }
 
@@ -105,18 +114,22 @@ public class HybridContentRetriever implements ContentRetriever {
             
             redis.clients.jedis.search.Query q = new redis.clients.jedis.search.Query(safeQuery)
                     .limit(0, 15)
-                    .returnFields("text", "file_name");
+                    .returnFields("text", "file_name", "uploader_role");
                     
             SearchResult searchResult = jedisPooled.ftSearch("embedding-index", q);
             
             for (Document doc : searchResult.getDocuments()) {
                 String text = (String) doc.get("text");
                 String fileName = (String) doc.get("file_name");
+                String uploaderRole = (String) doc.get("uploader_role");
                 
                 if (text != null && !text.isEmpty()) {
                     Metadata metadata = new Metadata();
                     if (fileName != null) {
                         metadata.put("file_name", fileName);
+                    }
+                    if (uploaderRole != null) {
+                        metadata.put("uploader_role", uploaderRole);
                     }
                     results.add(Content.from(TextSegment.from(text, metadata)));
                 }

@@ -19,7 +19,6 @@ com\example\backend\service\UserService.class
 com\example\backend\config\WebMvcConfig.class
 com\example\backend\BackendApplication.class
 com\example\backend\service\UploadedFileService.class
-application.yml
 com\example\backend\pojo\Result.class
 com\example\backend\pojo\ChatSession.class
 com\example\backend\service\impl\BookServiceImpl.class
