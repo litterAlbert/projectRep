@@ -19,6 +19,12 @@ public class ReserveRecord {
     private String title;
 
     @TableField(exist = false)
+    private String author;
+
+    @TableField(exist = false)
+    private String publisher;
+
+    @TableField(exist = false)
     private String username;
 
     public ReserveRecord() {}
@@ -49,6 +55,30 @@ public class ReserveRecord {
      * 时间: 2026-03-30
      */
     public void setTitle(String title) { this.title = title; }
+
+    /**
+     * 获取作者
+     * 时间: 2026-04-15
+     */
+    public String getAuthor() { return this.author; }
+
+    /**
+     * 设置作者
+     * 时间: 2026-04-15
+     */
+    public void setAuthor(String author) { this.author = author; }
+
+    /**
+     * 获取出版社
+     * 时间: 2026-04-15
+     */
+    public String getPublisher() { return this.publisher; }
+
+    /**
+     * 设置出版社
+     * 时间: 2026-04-15
+     */
+    public void setPublisher(String publisher) { this.publisher = publisher; }
 
     /**
      * 获取用户名

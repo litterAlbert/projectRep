@@ -9,6 +9,14 @@
       <div class="info-item"><span>角色：</span> {{ userStore.userInfo.role === 'user' ? '普通用户' : '管理员' }}</div>
     </div>
 
+    <h3>预约记录</h3>
+    <el-table :data="reserveData" style="width: 100%; margin-bottom: 24px;" v-loading="reserveLoading">
+      <el-table-column prop="title" label="书名" min-width="100" />
+      <el-table-column prop="author" label="作者" min-width="100" align="center" />
+      <el-table-column prop="publisher" label="出版社" min-width="150" align="center" />
+      <el-table-column prop="reserveDate" label="预约日期" width="180" align="center" :formatter="formatDate" />
+    </el-table>
+
     <h3>历史借阅记录</h3>
     <el-table :data="tableData" style="width: 100%" v-loading="loading">
       <el-table-column prop="title" label="书名" min-width="100" />
@@ -29,6 +37,8 @@ import dayjs from 'dayjs'
 const userStore = useUserStore()
 const loading = ref(false)
 const tableData = ref([])
+const reserveLoading = ref(false)
+const reserveData = ref([])
 
 /**
  * 格式化日期
@@ -59,8 +69,25 @@ const fetchRecords = async () => {
   }
 }
 
+/**
+ * 获取预约记录
+ * @date 2026-04-15
+ */
+const fetchReserves = async () => {
+  reserveLoading.value = true
+  try {
+    const res = await request.get('/action/reserve/list')
+    reserveData.value = res.data || []
+  } catch (error) {
+    console.error(error)
+  } finally {
+    reserveLoading.value = false
+  }
+}
+
 onMounted(() => {
   fetchRecords()
+  fetchReserves()
 })
 </script>
 

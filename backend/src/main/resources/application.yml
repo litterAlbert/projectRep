@@ -52,6 +52,7 @@ langchain4j:
       metadata-keys:
         - file_name
         - file_url
+        - uploader_role
 
 aliyun:
   oss:

@@ -156,6 +156,33 @@ public class ActionController {
     }
 
     /**
+     * 获取个人预约记录列表
+     * 时间: 2026-04-15
+     *
+     * @return 个人预约记录列表
+     */
+    @GetMapping("/reserve/list")
+    public Result<List<ReserveRecord>> myReserveList() {
+        UserContext.UserContextInfo info = UserContext.get();
+        if (info == null) return Result.error(401, "未登录");
+
+        QueryWrapper<ReserveRecord> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", info.getUserId());
+        List<ReserveRecord> records = reserveRecordService.list(queryWrapper);
+
+        for (ReserveRecord record : records) {
+            Book book = bookService.getById(record.getBookId());
+            if (book != null) {
+                record.setTitle(book.getTitle());
+                record.setAuthor(book.getAuthor());
+                record.setPublisher(book.getPublisher());
+            }
+        }
+
+        return Result.success(records);
+    }
+
+    /**
      * 获取个人借阅记录 (仅返回已归还的记录，并包含图书详细信息)
      *
      * @return 借阅记录列表

@@ -392,7 +392,33 @@
   }
   ```
 
-### 3.6 获取所有借阅记录列表 (仅限管理员)
+### 3.6 获取个人预约记录列表
+
+- **URL**: `/action/reserve/list`
+- **Method**: `GET`
+- **响应 Body**:
+  ```json
+  {
+    "code": 200,
+    "message": "success",
+    "data": [
+      {
+        "id": 1,
+        "userId": 1,
+        "bookId": 1,
+        "title": "Java编程思想",
+        "author": "Bruce Eckel",
+        "publisher": "机械工业出版社",
+        "reserveDate": "2026-04-15T10:00:00.000+00:00",
+        "status": "RESERVED",
+        "createdAt": "2026-04-15T10:00:00.000+00:00",
+        "updatedAt": "2026-04-15T10:00:00.000+00:00"
+      }
+    ]
+  }
+  ```
+
+### 3.7 获取所有借阅记录列表 (仅限管理员)
 
 - **URL**: `/action/borrow/all`
 - **Method**: `GET`
@@ -420,7 +446,7 @@
   }
   ```
 
-### 3.7 新建一条借阅记录(仅限管理员)
+### 3.8 新建一条借阅记录(仅限管理员)
 
 - **URL**: `/action/borrow/create`
 - **Method**: `POST`
@@ -459,7 +485,7 @@
   }
   ```
 
-### 3.8 新建一条预约记录 (仅限管理员)
+### 3.9 新建一条预约记录 (仅限管理员)
 
 - **URL**: `/action/reserve/create`
 - **Method**: `POST`
@@ -576,7 +602,7 @@
   }
   ```
 
-### 4.4 获取会话列表
+### 4.5 获取会话列表
 
 - **URL**: `/ai/session/list`
 - **Method**: `GET`
@@ -597,7 +623,7 @@
   }
   ```
 
-### 4.5 删除会话
+### 4.6 删除会话
 
 - **URL**: `/ai/session/{sessionId}`
 - **Method**: `DELETE`
@@ -629,7 +655,7 @@
   }
   ```
 
-### 4.7 会话聊天
+### 4.8 会话聊天
 
 - **URL**: `/ai/chat/{sessionId}`
 - **Method**: `POST`

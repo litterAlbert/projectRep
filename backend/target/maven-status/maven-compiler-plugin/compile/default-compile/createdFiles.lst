@@ -17,6 +17,7 @@ com\example\backend\service\SmartAssistant.class
 com\example\backend\service\BookService.class
 com\example\backend\service\UserService.class
 com\example\backend\config\WebMvcConfig.class
+com\example\backend\tools\BookRecommendationTool.class
 com\example\backend\BackendApplication.class
 com\example\backend\service\UploadedFileService.class
 com\example\backend\pojo\Result.class
@@ -42,6 +43,7 @@ com\example\backend\service\impl\AiServiceImpl.class
 com\example\backend\config\AiConfig.class
 com\example\backend\service\ReserveRecordService.class
 com\example\backend\pojo\Book.class
+com\example\backend\tools\BookActionTool.class
 com\example\backend\mapper\UserMapper.class
 com\example\backend\pojo\User.class
 com\example\backend\service\impl\BorrowRecordServiceImpl.class

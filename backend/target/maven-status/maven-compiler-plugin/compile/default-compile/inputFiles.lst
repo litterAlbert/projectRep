@@ -39,6 +39,8 @@ D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\Reser
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\SmartAssistant.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\UploadedFileService.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\UserService.java
+D:\86188\desktop\project\backend\src\main\java\com\example\backend\tools\BookActionTool.java
+D:\86188\desktop\project\backend\src\main\java\com\example\backend\tools\BookRecommendationTool.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\tools\DataAnalysisTool.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\tools\HybridContentRetriever.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\tools\JwtTool.java
