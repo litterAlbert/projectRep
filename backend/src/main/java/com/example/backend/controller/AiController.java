@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.backend.pojo.ChatMessage;
 import com.example.backend.pojo.ChatSession;
 import com.example.backend.pojo.Result;
+import com.example.backend.pojo.UploadedFile;
 import com.example.backend.service.AiService;
 import com.example.backend.service.ChatMessageService;
 import com.example.backend.service.ChatSessionService;
+import com.example.backend.service.UploadedFileService;
 import com.example.backend.tools.UserContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +37,9 @@ public class AiController {
     @Autowired
     private ChatMessageService chatMessageService;
 
+    @Autowired
+    private UploadedFileService uploadedFileService;
+
     /**
      * 上传文档进行向量化
      * 时间: 2026-03-28
@@ -42,10 +47,23 @@ public class AiController {
     @PostMapping(value = "/upload", consumes = "multipart/form-data")
     public Result<Map<String, String>> uploadDoc(@RequestPart("file") MultipartFile file) {
         try {
+            UserContext.UserContextInfo info = UserContext.get();
+            if (info == null) return Result.error(401, "未登录");
+
             String url = aiService.uploadAndProcessDoc(file);
             Map<String, String> data = new java.util.HashMap<>();
             data.put("fileUrl", url);
             data.put("fileName", file.getOriginalFilename());
+            
+            // 记录文件信息到数据库
+            UploadedFile uploadedFile = new UploadedFile();
+            uploadedFile.setFileName(file.getOriginalFilename());
+            uploadedFile.setFileUrl(url);
+            uploadedFile.setUploader(info.getUsername());
+            uploadedFile.setUploaderRole(info.getRole());
+            uploadedFile.setCreatedAt(new Date());
+            uploadedFileService.save(uploadedFile);
+            
             return Result.success(data);
         } catch (Exception e) {
             e.printStackTrace();
@@ -60,12 +78,49 @@ public class AiController {
     @DeleteMapping("/document")
     public Result<String> deleteDoc(@RequestParam("fileUrl") String fileUrl, @RequestParam("fileName") String fileName) {
         try {
+            UserContext.UserContextInfo info = UserContext.get();
+            if (info == null) return Result.error(401, "未登录");
+
+            QueryWrapper<UploadedFile> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("file_url", fileUrl);
+            
+            // 如果不是管理员，只能删除自己上传的文件
+            if (!"admin".equals(info.getRole())) {
+                queryWrapper.eq("uploader", info.getUsername());
+                UploadedFile fileRecord = uploadedFileService.getOne(queryWrapper);
+                if (fileRecord == null) {
+                    return Result.error(403, "无权删除该文件或文件不存在");
+                }
+            }
+
             aiService.deleteDoc(fileUrl, fileName);
+            
+            // 删除数据库记录
+            uploadedFileService.remove(queryWrapper);
+            
             return Result.success("删除成功");
         } catch (Exception e) {
             e.printStackTrace();
             return Result.error("删除文档失败: " + e.getMessage());
         }
+    }
+
+    /**
+     * 获取已上传文件列表
+     * 时间: 2026-04-15
+     */
+    @GetMapping("/document/list")
+    public Result<List<UploadedFile>> getUploadedFiles() {
+        UserContext.UserContextInfo info = UserContext.get();
+        if (info == null) return Result.error(401, "未登录");
+
+        QueryWrapper<UploadedFile> query = new QueryWrapper<>();
+        // 管理员可获取所有已上传文件，用户只能获取自己上传的文件
+        if (!"admin".equals(info.getRole())) {
+            query.eq("uploader", info.getUsername());
+        }
+        query.orderByDesc("created_at");
+        return Result.success(uploadedFileService.list(query));
     }
 
     /**

@@ -190,7 +190,8 @@ public class AiServiceImpl implements AiService {
         if (chartType != null) {
             prompt += "\n（系统提示：用户要求生成" + chartType + "图表，请务必调用查询工具获取数据。并且为了前端渲染统一，请将返回数据中的计数字段的 key 统一转换为 'value'。严格以JSON格式返回：{\"type\":\"chart\",\"chartType\":\"" + chartType + "\",\"data\":[...]}，不要返回任何多余的解释文本或 Markdown 标记）";
         } else {
-            prompt += "\n（系统提示：如果回答基于提供的文档知识，请返回 {\"type\":\"doc\",\"content\":\"回答\",\"source_nodes\":[\"文档名\"]},（注意：来源source_nodes必须提取每段内容开头包含的 file_name 字段中的名字)；如果是普通问答，请严格以JSON格式返回：{\"type\":\"text\",\"content\":\"你的回答\"}，不要返回多余文本或 Markdown 标记）";
+            // 时间: 2026-04-15 增加防止大模型捏造知识的补充提示
+            prompt += "\n（系统提示：如果回答基于提供的文档知识，请返回 {\"type\":\"doc\",\"content\":\"回答\",\"source_nodes\":[\"文档名\"]},（注意：来源source_nodes必须提取每段内容开头包含的 file_name 字段中的名字)；如果知识库中没有相关知识，必须严格以JSON格式返回：{\"type\":\"text\",\"content\":\"知识库中没有相关知识\"}，绝不能给出错误的回答；如果是普通问答，请严格以JSON格式返回：{\"type\":\"text\",\"content\":\"你的回答\"}，不要返回多余文本或 Markdown 标记）";
         }
 
         try {

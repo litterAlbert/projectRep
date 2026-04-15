@@ -76,6 +76,11 @@ const router = createRouter({
           path: 'ai',
           name: 'userAI',
           component: () => import('../views/user/AIAssistant.vue')
+        },
+        {
+          path: 'knowledge',
+          name: 'userKnowledge',
+          component: () => import('../views/user/KnowledgeManage.vue')
         }
       ]
     }

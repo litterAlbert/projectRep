@@ -528,7 +528,30 @@
   }
   ```
 
-### 4.3 新建会话
+### 4.3 获取已上传文件列表
+
+- **URL**: `/ai/document/list`
+- **Method**: `GET`
+- **说明**: 管理员可获取所有已上传文件，普通用户只能获取自己上传的文件。
+- **响应 Body**:
+  ```json
+  {
+    "code": 200,
+    "message": "success",
+    "data": [
+      {
+        "id": 1,
+        "fileName": "Java编程思想.pdf",
+        "fileUrl": "https://oss-url-to-uploaded-file.com/doc.pdf",
+        "uploader": "test_user",
+        "uploaderRole": "user",
+        "createdAt": "2026-04-15T10:00:00.000+00:00"
+      }
+    ]
+  }
+  ```
+
+### 4.4 新建会话
 
 - **URL**: `/ai/session`
 - **Method**: `POST`
@@ -553,7 +576,7 @@
   }
   ```
 
-### 4.4 获取会话列表
+### 4.5 获取会话列表
 
 - **URL**: `/ai/session/list`
 - **Method**: `GET`
@@ -574,7 +597,7 @@
   }
   ```
 
-### 4.5 删除会话
+### 4.6 删除会话
 
 - **URL**: `/ai/session/{sessionId}`
 - **Method**: `DELETE`
@@ -606,7 +629,7 @@
   }
   ```
 
-### 4.7 会话聊天
+### 4.8 会话聊天
 
 - **URL**: `/ai/chat/{sessionId}`
 - **Method**: `POST`

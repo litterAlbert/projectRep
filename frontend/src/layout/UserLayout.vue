@@ -37,6 +37,9 @@
         <router-link to="/user/ai" class="menu-item" active-class="active">
           <el-icon><ChatDotRound /></el-icon>AI助手
         </router-link>
+        <router-link to="/user/knowledge" class="menu-item" active-class="active">
+          <el-icon><Document /></el-icon>知识库管理
+        </router-link>
       </div>
     </aside>
 
@@ -56,7 +59,7 @@
 <script setup>
 import { useUserStore } from '../stores/user'
 import { useRouter } from 'vue-router'
-import { Reading, Collection, RefreshLeft, User, ChatDotRound, SwitchButton } from '@element-plus/icons-vue'
+import { Reading, Collection, RefreshLeft, User, ChatDotRound, SwitchButton, Document } from '@element-plus/icons-vue'
 
 const userStore = useUserStore()
 const router = useRouter()

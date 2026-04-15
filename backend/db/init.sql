@@ -56,6 +56,16 @@ CREATE TABLE IF NOT EXISTS `reserve_record` (
   FOREIGN KEY (`book_id`) REFERENCES `book`(`id`)
 ) ENGINE=InnoDB COMMENT='预约记录表';
 
+-- 上传文件记录表
+CREATE TABLE IF NOT EXISTS `uploaded_file` (
+  `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+  `file_name` VARCHAR(255) NOT NULL COMMENT '文件名称',
+  `file_url` VARCHAR(1000) NOT NULL COMMENT '文件链接',
+  `uploader` VARCHAR(50) NOT NULL COMMENT '上传人',
+  `uploader_role` VARCHAR(20) NOT NULL COMMENT '上传人角色',
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间'
+) ENGINE=InnoDB COMMENT='上传文件记录表';
+
 -- AI 会话表
 CREATE TABLE IF NOT EXISTS `chat_session` (
   `id` VARCHAR(36) PRIMARY KEY COMMENT '会话ID',

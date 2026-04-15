@@ -66,7 +66,7 @@ public class AiConfig {
                 .embeddingStore(redisEmbeddingStore)
                 .embeddingModel(embeddingModel)
                 .minScore(0.5) // 设置最低相似度阈值
-                .maxResults(5) // 每次最多返回3条相关文档片段
+                .maxResults(10) // 每次最多返回10条相关文档片段
                 .build();
                 
         // 2. 由于底层使用的是 RedisSearch，我们强制创建 JedisPooled 客户端，确保混合检索功能可用

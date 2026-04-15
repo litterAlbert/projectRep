@@ -12,6 +12,7 @@ D:\86188\desktop\project\backend\src\main\java\com\example\backend\mapper\Borrow
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\mapper\ChatMessageMapper.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\mapper\ChatSessionMapper.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\mapper\ReserveRecordMapper.java
+D:\86188\desktop\project\backend\src\main\java\com\example\backend\mapper\UploadedFileMapper.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\mapper\UserMapper.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\pojo\Book.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\pojo\BorrowRecord.java
@@ -19,6 +20,7 @@ D:\86188\desktop\project\backend\src\main\java\com\example\backend\pojo\ChatMess
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\pojo\ChatSession.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\pojo\ReserveRecord.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\pojo\Result.java
+D:\86188\desktop\project\backend\src\main\java\com\example\backend\pojo\UploadedFile.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\pojo\User.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\AiService.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\BookService.java
@@ -31,9 +33,11 @@ D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\impl\
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\impl\ChatMessageServiceImpl.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\impl\ChatSessionServiceImpl.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\impl\ReserveRecordServiceImpl.java
+D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\impl\UploadedFileServiceImpl.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\impl\UserServiceImpl.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\ReserveRecordService.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\SmartAssistant.java
+D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\UploadedFileService.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\UserService.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\tools\DataAnalysisTool.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\tools\HybridContentRetriever.java

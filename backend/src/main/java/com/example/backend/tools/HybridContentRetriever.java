@@ -104,7 +104,7 @@ public class HybridContentRetriever implements ContentRetriever {
             }
             
             redis.clients.jedis.search.Query q = new redis.clients.jedis.search.Query(safeQuery)
-                    .limit(0, maxResults)
+                    .limit(0, 15)
                     .returnFields("text", "file_name");
                     
             SearchResult searchResult = jedisPooled.ftSearch("embedding-index", q);
