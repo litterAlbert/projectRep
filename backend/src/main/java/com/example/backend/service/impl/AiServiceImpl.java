@@ -196,8 +196,8 @@ public class AiServiceImpl implements AiService {
         if (chartType != null) {
             prompt += "\n（系统提示：用户要求生成" + chartType + "图表，请务必调用查询工具获取数据。并且为了前端渲染统一，请将返回数据中的计数字段的 key 统一转换为 'value'。严格以JSON格式返回：{\"type\":\"chart\",\"chartType\":\"" + chartType + "\",\"data\":[...]}，不要返回任何多余的解释文本或 Markdown 标记）";
         } else {
-            // 时间: 2026-04-15 增加防止大模型捏造知识的补充提示
-            prompt += "\n（系统提示：如果是询问书籍推荐，你必须先调用 BookRecommendationTool 工具获取推荐数据，然后根据工具返回的 JSON 数据（包含书名、作者等信息），向用户进行友好的文本推荐，并严格以JSON格式返回：{\"type\":\"text\",\"content\":\"你的推荐回答\"}。如果用户询问系统统计或普通闲聊，请直接处理并严格以JSON格式返回：{\"type\":\"text\",\"content\":\"你的回答\"}；如果回答基于提供的文档知识，请返回 {\"type\":\"doc\",\"content\":\"回答\",\"source_nodes\":[\"文档名\"]}（注意：来源source_nodes必须提取每段内容开头包含的 file_name 字段中的名字)；如果明确是针对文档知识库的提问且知识库中没有相关知识，必须严格以JSON格式返回：{\"type\":\"text\",\"content\":\"知识库中没有相关知识\"}，绝不能给出错误的回答，不要返回多余文本或 Markdown 标记）";
+            // 时间: 2026-04-16 增加防止大模型捏造知识的补充提示，并包含图书操作说明
+            prompt += "\n（系统提示：如果是询问书籍推荐，你必须先调用 BookRecommendationTool 工具获取推荐数据，然后根据工具返回的 JSON 数据（包含书名、作者等信息），向用户进行友好的文本推荐，并严格以JSON格式返回：{\"type\":\"text\",\"content\":\"你的推荐回答\"}。如果用户询问系统统计、进行图书操作（借阅/预约）或普通闲聊，请直接处理并严格以JSON格式返回：{\"type\":\"text\",\"content\":\"你的回答\"}；如果回答基于提供的文档知识，请返回 {\"type\":\"doc\",\"content\":\"回答\",\"source_nodes\":[\"文档名\"]}（注意：来源source_nodes必须提取每段内容开头包含的 file_name 字段中的名字)；如果明确是针对文档知识库的提问且知识库中没有相关知识，必须严格以JSON格式返回：{\"type\":\"text\",\"content\":\"知识库中没有相关知识\"}，绝不能给出错误的回答，不要返回多余文本或 Markdown 标记）";
         }
 
         try {
@@ -206,6 +206,14 @@ public class AiServiceImpl implements AiService {
             
             // 清理可能的 markdown 代码块标记
             response = response.replaceAll("```json", "").replaceAll("```", "").trim();
+            
+            // 时间: 2026-04-16 新增容错机制，防止 LLM 未返回 JSON 格式
+            if (!response.startsWith("{")) {
+                Map<String, Object> fallbackRes = new HashMap<>();
+                fallbackRes.put("type", "text");
+                fallbackRes.put("content", response);
+                return fallbackRes;
+            }
             
             ObjectMapper mapper = new ObjectMapper();
             return (Map<String, Object>) mapper.readValue(response, Map.class);

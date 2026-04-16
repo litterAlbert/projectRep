@@ -330,6 +330,16 @@ const renderChart = (msgId, chartData) => {
   nextTick(() => {
     const el = chartRefs.value[msgId]
     if (el) {
+      // 根据数据量动态计算图表宽度，实现自适应布局 (2026-04-16)
+      if (chartData.chartType !== 'pie') {
+        const itemWidth = 80; // 每个数据项分配80px宽度 (2026-04-16)
+        const minWidth = 600; // 最小宽度 (2026-04-16)
+        const dynamicWidth = Math.max(minWidth, chartData.data.length * itemWidth);
+        el.style.width = dynamicWidth + 'px';
+      } else {
+        el.style.width = '600px';
+      }
+
       const myChart = echarts.init(el)
       
       let seriesItem = {
@@ -380,7 +390,37 @@ const renderChart = (msgId, chartData) => {
           trigger: chartData.chartType === 'pie' ? 'item' : 'axis',
           backgroundColor: 'rgba(255, 255, 255, 0.9)',
           borderColor: '#e2e8f0',
-          textStyle: { color: '#334155' }
+          textStyle: { color: '#334155' },
+          appendToBody: true // 解决 tooltip 被父容器 overflow 隐藏的问题 (2026-04-16)
+        },
+        toolbox: {
+          feature: {
+            saveAsImage: { title: '保存图片' },
+            myCopy: {
+              show: true,
+              title: '复制图表',
+              icon: 'path://M19 21H8V7H19M19 5H8C6.9 5 5 5.9 5 7V21C5 22.1 5.9 23 7 23H19C20.1 23 21 22.1 21 21V7C21 5.9 20.1 5 19 5M16 1H4C2.9 1 2 1.9 2 3V17H4V3H16V1Z',
+              onclick: function () {
+                const url = myChart.getDataURL({
+                  type: 'png',
+                  backgroundColor: '#fff'
+                });
+                fetch(url)
+                  .then(res => res.blob())
+                  .then(blob => {
+                    navigator.clipboard.write([
+                      new ClipboardItem({
+                        [blob.type]: blob
+                      })
+                    ]).then(() => {
+                      ElMessage.success('图表已复制到剪贴板');
+                    }).catch(() => {
+                      ElMessage.error('复制失败');
+                    });
+                  });
+              }
+            }
+          }
         },
         grid: {
           left: '3%',
@@ -575,18 +615,20 @@ onMounted(() => {
   font-size: 14px;
   line-height: 1.6;
   word-break: break-all;
+  flex-shrink: 0;
 }
 
 .chart-bubble {
   max-width: 100% !important;
-  width: 600px;
+  width: auto;
   background: #fff !important;
   border: 1px solid #e2e8f0;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .chart-container {
-  width: 100%;
   height: 350px;
 }
 
