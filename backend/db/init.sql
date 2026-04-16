@@ -87,6 +87,22 @@ CREATE TABLE IF NOT EXISTS `chat_message` (
   FOREIGN KEY (`session_id`) REFERENCES `chat_session`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB COMMENT='AI消息记录表';
 
+-- 捐赠记录表
+CREATE TABLE IF NOT EXISTS `book_donation` (
+  `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` BIGINT NOT NULL COMMENT '用户ID',
+  `isbn` VARCHAR(20) NOT NULL COMMENT 'ISBN',
+  `title` VARCHAR(100) NOT NULL COMMENT '书名',
+  `author` VARCHAR(100) NOT NULL COMMENT '作者',
+  `publisher` VARCHAR(100) DEFAULT NULL COMMENT '出版社',
+  `publish_date` DATE DEFAULT NULL COMMENT '出版日期',
+  `count` INT NOT NULL DEFAULT 1 COMMENT '捐赠本数',
+  `status` VARCHAR(20) NOT NULL DEFAULT 'PENDING' COMMENT '状态: PENDING(待处理), PROCESSED(已入库), REJECTED(已拒绝)',
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `user`(`id`)
+) ENGINE=InnoDB COMMENT='捐赠记录表';
+
 -- 插入测试数据
 
 -- 密码使用明文 123456 进行测试（实际项目中应加密，由于未指定加密框架暂使用明文或简单MD5，这里先使用明文便于测试）

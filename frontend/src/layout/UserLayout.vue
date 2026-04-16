@@ -34,6 +34,9 @@
         <router-link to="/user/profile" class="menu-item" active-class="active">
           <el-icon><User /></el-icon>个人信息
         </router-link>
+        <router-link to="/user/donation" class="menu-item" active-class="active">
+          <el-icon><Present /></el-icon>旧书捐赠
+        </router-link>
         <router-link to="/user/ai" class="menu-item" active-class="active">
           <el-icon><ChatDotRound /></el-icon>AI助手
         </router-link>
@@ -59,7 +62,7 @@
 <script setup>
 import { useUserStore } from '../stores/user'
 import { useRouter } from 'vue-router'
-import { Reading, Collection, RefreshLeft, User, ChatDotRound, SwitchButton, Document } from '@element-plus/icons-vue'
+import { Reading, Collection, RefreshLeft, User, Present, ChatDotRound, SwitchButton, Document } from '@element-plus/icons-vue'
 
 const userStore = useUserStore()
 const router = useRouter()

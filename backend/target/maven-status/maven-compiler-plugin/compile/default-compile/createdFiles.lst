@@ -18,13 +18,17 @@ com\example\backend\service\BookService.class
 com\example\backend\service\UserService.class
 com\example\backend\config\WebMvcConfig.class
 com\example\backend\tools\BookRecommendationTool.class
+com\example\backend\pojo\BookDonation.class
+com\example\backend\service\BookDonationService.class
 com\example\backend\BackendApplication.class
 com\example\backend\service\UploadedFileService.class
+com\example\backend\mapper\BookDonationMapper.class
 com\example\backend\pojo\Result.class
 com\example\backend\pojo\ChatSession.class
 com\example\backend\service\impl\BookServiceImpl.class
 com\example\backend\tools\SemanticDocumentSplitter.class
 com\example\backend\tools\HybridContentRetriever.class
+com\example\backend\controller\BookDonationController.class
 com\example\backend\service\ChatMessageService.class
 com\example\backend\controller\UserController.class
 com\example\backend\mapper\BookMapper.class
@@ -48,3 +52,4 @@ com\example\backend\mapper\UserMapper.class
 com\example\backend\pojo\User.class
 com\example\backend\service\impl\BorrowRecordServiceImpl.class
 com\example\backend\service\impl\ChatMessageServiceImpl.class
+com\example\backend\service\impl\BookDonationServiceImpl.class

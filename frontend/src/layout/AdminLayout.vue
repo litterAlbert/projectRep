@@ -34,6 +34,9 @@
         <router-link to="/admin/borrow" class="menu-item" active-class="active">
           <el-icon><Collection /></el-icon>借阅管理
         </router-link>
+        <router-link to="/admin/donation" class="menu-item" active-class="active">
+          <el-icon><Box /></el-icon>旧书入库
+        </router-link>
         <router-link to="/admin/ai" class="menu-item" active-class="active">
           <el-icon><ChatDotRound /></el-icon>AI助手
         </router-link>
@@ -59,7 +62,7 @@
 <script setup>
 import { useUserStore } from '../stores/user'
 import { useRouter } from 'vue-router'
-import { Reading, Notebook, User, Collection, ChatDotRound, SwitchButton, Files } from '@element-plus/icons-vue'
+import { Reading, Notebook, User, Collection, Box, ChatDotRound, SwitchButton, Files } from '@element-plus/icons-vue'
 
 const userStore = useUserStore()
 const router = useRouter()

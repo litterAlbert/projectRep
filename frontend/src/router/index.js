@@ -40,6 +40,11 @@ const router = createRouter({
           component: () => import('../views/admin/BorrowManage.vue')
         },
         {
+          path: 'donation',
+          name: 'adminDonation',
+          component: () => import('../views/admin/BookDonationManage.vue')
+        },
+        {
           path: 'ai',
           name: 'adminAI',
           component: () => import('../views/admin/AIAssistant.vue')
@@ -71,6 +76,11 @@ const router = createRouter({
           path: 'profile',
           name: 'userProfile',
           component: () => import('../views/user/Profile.vue')
+        },
+        {
+          path: 'donation',
+          name: 'userDonation',
+          component: () => import('../views/user/BookDonation.vue')
         },
         {
           path: 'ai',

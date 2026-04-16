@@ -743,3 +743,113 @@
   }
   ```
 
+***
+
+## 5. 图书捐赠模块 (`/donation`)
+
+### 5.1 提交图书捐赠 (用户)
+
+- **URL**: `/donation/submit`
+- **Method**: `POST`
+- **请求 Body**:
+  ```json
+  {
+    "isbn": "978-7-111-12806-9",
+    "title": "C程序设计语言",
+    "author": "Brian W.Kernighan",
+    "publisher": "机械工业出版社",
+    "publishDate": "2004-01-01",
+    "count": 2
+  }
+  ```
+- **响应 Body**:
+  ```json
+  {
+    "code": 200,
+    "message": "success",
+    "data": "捐赠申请提交成功，等待管理员处理"
+  }
+  ```
+
+### 5.2 获取个人捐赠记录
+
+- **URL**: `/donation/my`
+- **Method**: `GET`
+- **响应 Body**:
+  ```json
+  {
+    "code": 200,
+    "message": "success",
+    "data": [
+      {
+        "id": 1,
+        "userId": 1,
+        "isbn": "978-7-111-12806-9",
+        "title": "C程序设计语言",
+        "author": "Brian W.Kernighan",
+        "publisher": "机械工业出版社",
+        "publishDate": "2004-01-01",
+        "count": 2,
+        "status": "PENDING",
+        "createdAt": "2026-04-16T10:00:00.000+00:00",
+        "updatedAt": "2026-04-16T10:00:00.000+00:00"
+      }
+    ]
+  }
+  ```
+
+### 5.3 获取所有捐赠记录 (管理员)
+
+- **URL**: `/donation/list`
+- **Method**: `GET`
+- **响应 Body**:
+  ```json
+  {
+    "code": 200,
+    "message": "success",
+    "data": [
+      {
+        "id": 1,
+        "userId": 1,
+        "username": "testuser",
+        "isbn": "978-7-111-12806-9",
+        "title": "C程序设计语言",
+        "author": "Brian W.Kernighan",
+        "publisher": "机械工业出版社",
+        "publishDate": "2004-01-01",
+        "count": 2,
+        "status": "PENDING",
+        "createdAt": "2026-04-16T10:00:00.000+00:00",
+        "updatedAt": "2026-04-16T10:00:00.000+00:00"
+      }
+    ]
+  }
+  ```
+
+### 5.4 管理员处理旧书入库操作
+
+- **URL**: `/donation/process/{id}?location={location}`
+- **Method**: `POST`
+- **请求参数**: `location` (String, 必须，指定新书入库的馆藏位置)
+- **响应 Body**:
+  ```json
+  {
+    "code": 200,
+    "message": "success",
+    "data": "入库成功"
+  }
+  ```
+
+### 5.5 管理员拒绝捐赠申请
+
+- **URL**: `/donation/reject/{id}`
+- **Method**: `POST`
+- **响应 Body**:
+  ```json
+  {
+    "code": 200,
+    "message": "success",
+    "data": "已拒绝该捐赠"
+  }
+  ```
+

@@ -6,7 +6,9 @@ D:\86188\desktop\project\backend\src\main\java\com\example\backend\config\WebMvc
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\controller\ActionController.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\controller\AiController.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\controller\BookController.java
+D:\86188\desktop\project\backend\src\main\java\com\example\backend\controller\BookDonationController.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\controller\UserController.java
+D:\86188\desktop\project\backend\src\main\java\com\example\backend\mapper\BookDonationMapper.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\mapper\BookMapper.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\mapper\BorrowRecordMapper.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\mapper\ChatMessageMapper.java
@@ -15,6 +17,7 @@ D:\86188\desktop\project\backend\src\main\java\com\example\backend\mapper\Reserv
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\mapper\UploadedFileMapper.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\mapper\UserMapper.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\pojo\Book.java
+D:\86188\desktop\project\backend\src\main\java\com\example\backend\pojo\BookDonation.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\pojo\BorrowRecord.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\pojo\ChatMessage.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\pojo\ChatSession.java
@@ -23,11 +26,13 @@ D:\86188\desktop\project\backend\src\main\java\com\example\backend\pojo\Result.j
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\pojo\UploadedFile.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\pojo\User.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\AiService.java
+D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\BookDonationService.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\BookService.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\BorrowRecordService.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\ChatMessageService.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\ChatSessionService.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\impl\AiServiceImpl.java
+D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\impl\BookDonationServiceImpl.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\impl\BookServiceImpl.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\impl\BorrowRecordServiceImpl.java
 D:\86188\desktop\project\backend\src\main\java\com\example\backend\service\impl\ChatMessageServiceImpl.java
